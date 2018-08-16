@@ -97,12 +97,18 @@ class SinaLogin(object):
 		self.uid = uid 
 		#set cookie 
 		s = self.session.get(url2)
+		cookies = {}
+		for item in s.cookies.items():
+			cookies[item[0]] = item[1]
+		print cookies
 		print 'login successfully'
 		return None
 	def get_homepage(self):
 		home_url = 'https://weibo.com/u/{}/home?wvr=5'.format(str(self.uid))
-		home_page = self.session.get(home_url).text
-		return home_page
+		home_page = self.session.get(home_url)
+		for item in home_page.cookies.items():
+			print item
+		return home_page.text
 	def get_others_homepage(self,uid):
 		home_url = 'https://weibo.com/u/{}/home?wvr=5'.format(str(uid))
 		home_page = self.session.get(home_url).text
@@ -137,15 +143,17 @@ class SinaLogin(object):
 			sys.stdout = __stdout__
 			f.close()
 			uid_list = self.parse_myfollow(home_page)
-			for uid in uid_list:
-				if uid == 0:
-					print '88888888'
-					flag = False
-					break;
-				page_id_list.append(self.get_unique_page_id(uid))
+			if uid_list == []:
+				print '88888888'
+				flag = False
+				break;
 			i = i+1
+			for uid in uid_list:
 
-			return page_id_list
+				yield self.get_unique_page_id(uid)
+
+
+			# return page_id_list
 	def parse_myfollow(self,html):
 		# soup = BeautifulSoup(html,'lxml')
 		# print soup.title
@@ -160,15 +168,20 @@ class SinaLogin(object):
 		if following_list:
 			for item in following_list:
 				print item
-			for uid in following_uid_list:
-				print uid
-				yield uid
-		else:
-			yield 0
+		return following_uid_list
+
 if __name__ == "__main__":
 	sinalogin = SinaLogin()
 	sinalogin.login()
-	sinalogin.get_myfollowers_page_id()
+	page_id_list = sinalogin.get_myfollowers_page_id()
+	for id in page_id_list:
+		print type(id)
+		new_id = '107603' + id[6:]
+		print "yield:  ",new_id 
+	home_url = 'https://weibo.com/u/{}/home?wvr=5'.format(str(sinalogin.uid))
+	cookies = sinalogin.session.get(home_url).cookies
+	for item in cookies.items():
+		print item
 	# print s.status_code,'3333333'
 	# print s.text.decode('utf-8').encode('gbk','ignore')
 	# print s.history

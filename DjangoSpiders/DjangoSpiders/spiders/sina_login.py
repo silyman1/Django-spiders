@@ -102,7 +102,7 @@ class SinaLogin(object):
 			cookies[item[0]] = item[1]
 		print cookies
 		print 'login successfully'
-		return None
+		return cookies
 	def get_homepage(self):
 		home_url = 'https://weibo.com/u/{}/home?wvr=5'.format(str(self.uid))
 		home_page = self.session.get(home_url)
@@ -116,8 +116,8 @@ class SinaLogin(object):
 	def get_unique_page_id(self,uid):
 		print 'uid:',uid
 		html = self.get_others_homepage(uid)
-		with open('ttt.txt','w+') as f:
-			f.write(html)
+		# with open('ttt.txt','w+') as f:
+		# 	f.write(html)
 		pattern  = re.compile("CONFIG\[\'page_id\'\]=\'(\d+)\'",re.S)
 		page_id = re.findall(pattern,html)[0]
 		return page_id
@@ -131,20 +131,19 @@ class SinaLogin(object):
 		requests.adapters.DEFAULT_RETRIES = 10
 		page_id_list = []
 		while flag:
-			f = open('sina%d.txt'%i,'w+')
-			__stdout__ = sys.stdout
-			sys.stdout = f
+			# f = open('sina%d.txt'%i,'w+')
+			# __stdout__ = sys.stdout
+			# sys.stdout = f
 			page_url = 'https://weibo.com/p/{}/myfollow?t=1&cfs=&Pl_Official_RelationMyfollow__92_page={}#Pl_Official_RelationMyfollow__92'.format(str(page_id),str(i))
 			print page_url
 			home_page = self.session.get(page_url).text
 
 			print '==========================='
 			print home_page.encode('gbk','ignore')
-			sys.stdout = __stdout__
-			f.close()
+			# sys.stdout = __stdout__
+			# f.close()
 			uid_list = self.parse_myfollow(home_page)
 			if uid_list == []:
-				print '88888888'
 				flag = False
 				break;
 			i = i+1

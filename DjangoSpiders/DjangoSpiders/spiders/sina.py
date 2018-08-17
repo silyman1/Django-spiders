@@ -30,6 +30,7 @@ class SinaSpider(Spider):
 		status = content.get('ok')
 
 		fo = open('sina.log','a+')
+		__stdout__ = sys.stdout
 		sys.stdout = fo
 		rawurl = response.url
 		print '###############'
@@ -42,6 +43,7 @@ class SinaSpider(Spider):
 			for info in weibo_info:
 				try:
 					brief_tmp = ''
+					item['itemid'] = info.get('itemid')
 					item['author'] = info.get('mblog').get('user').get('screen_name')
 					print item['author'].encode('utf-8')
 					item['post_detail'] = info.get('scheme')
@@ -60,7 +62,8 @@ class SinaSpider(Spider):
 					print item['post'].encode('utf-8')
 				except Exception:
 					self.error_url.add(rawurl)
-
+					print 'error_list:',self.error_url
+					raise Exception
 				yield item 
 
 			num = re.findall(r'&page=(\d+)',rawurl)[0]
@@ -68,7 +71,7 @@ class SinaSpider(Spider):
 			nexturl = rawurl.replace('&page='+num,'&page='+str(new_num))
 			print '%%%%%%%%%%%%%%%%%%%'
 			print nexturl
-			print 'error_list:',self.error_list
+			sys.stdout = __stdout__
 			yield Request(nexturl,cookies =self.cookies)
 		# for info in weibo_info:
 		# 	print '========',i,'========='

@@ -21,6 +21,12 @@ NEWSPIDER_MODULE = 'DjangoSpiders.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+#mysql
+MYSQL_HOSTS = '127.0.0.1'
+MYSQL_USER = 'root'
+MYSQL_PASSWORD = 'pzc'
+MYSQL_DB = 'test'
+MYCHARSET = 'utf-8'
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
@@ -64,9 +70,10 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
+ITEM_PIPELINES = {
 #    'DjangoSpiders.pipelines.DjangospidersPipeline': 300,
-#}
+    'DjangoSpiders.mysqlpipelines.pipelines.DjangospidersPipeline': 1,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

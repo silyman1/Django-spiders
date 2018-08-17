@@ -25,4 +25,6 @@ class SinaItem(scrapy.Item):
     post_detail = scrapy.Field()
     #发表时间
     post_time = scrapy.Field()
+    #item_unique id
+    itemid = scrapy.Field()
 

@@ -70,14 +70,14 @@ class Sinadb(object):
 		sql = """CREATE TABLE IF NOT EXISTS pageid_tb(
 			`id` int PRIMARY KEY AUTO_INCREMENT,
 			`page_id` int ,
-			`page_num` int DEFAULT 1))DEFAULT CHARSET=utf8;"""
+			`page_num` int DEFAULT 1)DEFAULT CHARSET=utf8;"""
 		try:
 			cursor.execute(sql)
 		except MySQLdb.Error,e:
 			print time.strftime('[%Y-%m-%d %H:%M:%S]', time.localtime(time.time())),'creating table failed...reason:',e
 	@classmethod	
 	def insert_pageid_tb(cls,page_id,page_num):
-		sql1 = "SELECT 1 FROM sina_tb WHERE page_id = '%s'" %page_id
+		sql1 = "SELECT 1 FROM pageid_tb WHERE page_id = '%s'" %page_id
 		cursor.execute(sql1)
 		results = cursor.fetchall()
 		if results == ():
@@ -97,7 +97,7 @@ class Sinadb(object):
 			print time.strftime('[%Y-%m-%d %H:%M:%S]', time.localtime(time.time())),'insert page_id error...reason:',e
 	@classmethod	
 	def get_page_num(cls,page_id):
-		sql = "SELECT 1 FROM sina_tb WHERE page_id = '%s'" %page_id
+		sql = "SELECT 1 FROM pageid_tb WHERE page_id = '%s'" %page_id
 		cursor.execute(sql)
 		results = cursor.fetchall()
 		if results == ():

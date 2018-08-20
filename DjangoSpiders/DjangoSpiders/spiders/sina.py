@@ -11,6 +11,8 @@ import sys
 class SinaSpider(Spider):
 	def __init__(self):
 		self.cookies = {}
+		self.headers = {'User-Agent':'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36'
+						}
 		self.error_url = set()
 	name = 'sina_following'
 	allowded_domains =['weibo.com']
@@ -25,7 +27,7 @@ class SinaSpider(Spider):
 			new_id = '107603' + page_id[6:]
 			page_num = pipelines.DjangospidersPipeline.get_page_num_by_pid(new_id)
 			url = 'https://m.weibo.cn/api/container/getIndex?containerid='+ new_id + '&page='+str(page_num)
-			yield Request(url,cookies =self.cookies)
+			yield Request(url,cookies =self.cookies,headers =self.headers )
 	def parse(self,response):
 		item = SinaItem()
 		content = json.loads(response.body)
@@ -50,8 +52,9 @@ class SinaSpider(Spider):
 					print item['author'].encode('utf-8')
 					item['post_detail'] = info.get('scheme')
 					item['post_time'] = info.get('mblog').get('created_at')
-					item['comments_count'] = info.get('user').get('comments_count')	
-					item['attitudes_count'] = info.get('user').get('attitudes_count')					
+					item['comments_count'] = info.get('mblog').get('comments_count')	
+					item['attitudes_count'] = info.get('mblog').get('attitudes_count')
+					print '#############',item['comments_count'],item['attitudes_count']				
 					if info.get('mblog').get('user').get('verified_reason'):
 						brief_tmp = brief_tmp +  info.get('mblog').get('user').get('verified_reason') + '<br>'
 					if info.get('mblog').get('user').get('description'):

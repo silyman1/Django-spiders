@@ -16,9 +16,9 @@ class DjangospidersPipeline(object):
 			post =  MySQLdb.escape_string(item['post'])
 			post_detail =  MySQLdb.escape_string(item['post_detail'])
 			post_time =  MySQLdb.escape_string(item['post_time'])
-			comments_count =  MySQLdb.escape_string(item['comments_count'])
-			attitudes_count =  MySQLdb.escape_string(item['attitudes_count'])
-			heat_count = MySQLdb.escape_string(self.get_heat_count(int(item['comments_count']),int(item['attitudes_count'])))
+			comments_count =  item['comments_count']
+			attitudes_count =  item['attitudes_count']
+			heat_count = self.get_heat_count(int(item['comments_count']),int(item['attitudes_count']))
 			itemid = MySQLdb.escape_string(item['itemid'])
 			fo = open('sql.log','a+')
 			__stdout__ = sys.stdout
@@ -32,12 +32,13 @@ class DjangospidersPipeline(object):
 		return heat_count
 	@classmethod
 	def process_page_id(cls,page_id,page_num):
-		page_id =  MySQLdb.escape_string(page_id)
-		page_num =  MySQLdb.escape_string(page_num)	
+		page_id = int(page_id)
+		page_num =  int(page_num)
 		sql.Sinadb.create_pageid_tb()	
 		sql.Sinadb.insert_pageid_tb(page_id,page_num)
 	@classmethod
 	def get_page_num_by_pid(cls,page_id):
-		page_id = MySQLdb.escape_string(page_id)
+		page_id = int(page_id)
+		sql.Sinadb.create_pageid_tb()
 		page_num = sql.Sinadb.get_page_num(page_id)
 		return page_num

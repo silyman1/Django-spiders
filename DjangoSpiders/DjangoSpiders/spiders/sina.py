@@ -6,6 +6,7 @@ import re
 from scrapy.spiders import Spider
 from sina_login import SinaLogin
 from DjangoSpiders.items import SinaItem
+from DjangoSpiders.mysqlpipelines import pipelines
 import sys
 class SinaSpider(Spider):
 	def __init__(self):
@@ -22,7 +23,8 @@ class SinaSpider(Spider):
 		page_id_list = self.get_pageid_list()
 		for page_id in page_id_list:
 			new_id = '107603' + page_id[6:]
-			url = 'https://m.weibo.cn/api/container/getIndex?containerid='+ new_id + '&page=1'
+			page_num = pipelines.DjangospidersPipeline.get_page_num_by_pid(new_id)
+			url = 'https://m.weibo.cn/api/container/getIndex?containerid='+ new_id + '&page='+str(page_num)
 			yield Request(url,cookies =self.cookies)
 	def parse(self,response):
 		item = SinaItem()
@@ -48,7 +50,8 @@ class SinaSpider(Spider):
 					print item['author'].encode('utf-8')
 					item['post_detail'] = info.get('scheme')
 					item['post_time'] = info.get('mblog').get('created_at')
-
+					item['comments_count'] = info.get('user').get('comments_count')	
+					item['attitudes_count'] = info.get('user').get('attitudes_count')					
 					if info.get('mblog').get('user').get('verified_reason'):
 						brief_tmp = brief_tmp +  info.get('mblog').get('user').get('verified_reason') + '<br>'
 					if info.get('mblog').get('user').get('description'):
@@ -67,6 +70,8 @@ class SinaSpider(Spider):
 				yield item 
 
 			num = re.findall(r'&page=(\d+)',rawurl)[0]
+			pid = re.findall(r'containerid=(\d+)',rawurl)[0]
+			pipelines.DjangospidersPipeline.process_page_id(pid,num)
 			new_num = int(num)+1
 			nexturl = rawurl.replace('&page='+num,'&page='+str(new_num))
 			print '%%%%%%%%%%%%%%%%%%%'

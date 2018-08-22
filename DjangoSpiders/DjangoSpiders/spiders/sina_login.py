@@ -21,6 +21,7 @@ class SinaLogin(object):
 
 		self.uid = 0					
 		self.session = requests.session()
+		self.page_id_list = set()
 		self.s = self.session.get('http://login.sina.com.cn',headers=self.headers)
 		if(self.s.status_code == 200):
 			print 'init session successfully'
@@ -139,7 +140,7 @@ class SinaLogin(object):
 			home_page = self.session.get(page_url).text
 
 			print '==========================='
-			print home_page.encode('gbk','ignore')
+			#print home_page.encode('gbk','ignore')
 			# sys.stdout = __stdout__
 			# f.close()
 			uid_list = self.parse_myfollow(home_page)
@@ -149,9 +150,9 @@ class SinaLogin(object):
 			i = i+1
 			for uid in uid_list:
 
-				yield self.get_unique_page_id(uid)
+				self.page_id_list.add(self.get_unique_page_id(uid))
 
-
+		return self.page_id_list
 			# return page_id_list
 	def parse_myfollow(self,html):
 		# soup = BeautifulSoup(html,'lxml')
@@ -162,8 +163,7 @@ class SinaLogin(object):
 		following_list = re.findall(pattern, html)
 		pattern2 = re.compile(r'<p class=\\"btn_bed\\">.*?&uid=(\d+)&sex',re.S)
 		following_uid_list = re.findall(pattern2, html)
-		print following_list
-		print following_uid_list
+
 		if following_list:
 			for item in following_list:
 				print item

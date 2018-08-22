@@ -69,7 +69,7 @@ class Sinadb(object):
 	def create_pageid_tb(cls):
 		sql = """CREATE TABLE IF NOT EXISTS pageid_tb(
 			`id` int PRIMARY KEY AUTO_INCREMENT,
-			`page_id` int ,
+			`page_id` VARCHAR(255),
 			`page_num` int DEFAULT 1)DEFAULT CHARSET=utf8;"""
 		try:
 			cursor.execute(sql)
@@ -80,15 +80,16 @@ class Sinadb(object):
 		sql1 = "SELECT 1 FROM pageid_tb WHERE page_id = '%s'" %page_id
 		cursor.execute(sql1)
 		results = cursor.fetchall()
+		print results,page_id
 		if results == ():
-			sql2 = "INSERT INTO pageid_tb(page_id,page_num)VALUES('%d','%d')"%(page_id,page_num)
+			sql2 = "INSERT INTO pageid_tb(page_id,page_num)VALUES('%s','%d')"%(page_id,page_num)
 		else:
-			sql2 ="UPDATE pageid_tb SET page_num='%d' WHERE page_id='%d'"%(page_num,page_id)
+			sql2 ="UPDATE pageid_tb SET page_num='%d' WHERE page_id='%s'"%(page_num,page_id)
 
 		try:
 			result = cursor.execute(sql2)
 			if result:
-				print 'insert NO.%d page_id'%db.insert_id()
+				print 'insert NO.%d page_id %s'%(db.insert_id(),page_id)
 			else:
 				print 'rolling back..................'
 				db.rollback()
@@ -97,9 +98,10 @@ class Sinadb(object):
 			print time.strftime('[%Y-%m-%d %H:%M:%S]', time.localtime(time.time())),'insert page_id error...reason:',e
 	@classmethod	
 	def get_page_num(cls,page_id):
-		sql = "SELECT 1 FROM pageid_tb WHERE page_id = '%s'" %page_id
+		sql = "SELECT * FROM pageid_tb WHERE page_id = '%s'" %page_id
 		cursor.execute(sql)
 		results = cursor.fetchall()
+		print results
 		if results == ():
 			return 1
 		else:

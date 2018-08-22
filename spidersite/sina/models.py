@@ -8,8 +8,9 @@ class User(AbstractUser,models.Model):
 	nickname = models.CharField(max_length=200,default='用户')
 	last_seen = models.DateTimeField(auto_now=False, auto_now_add=True)
 	avatar = models.CharField(max_length=200,default='avatar-default.jpg')
+	sina_username = models.CharField(max_length=200)
+	sina_password = models.CharField(max_length=200)
 class Following_Blogger(models.Model):
 	following_name = models.CharField(max_length=200,)
 	avatar = models.CharField(max_length=200,default='avatar-default.jpg')
-class Related_tb_name(models.Model):
-	tb_name = models.CharField(max_length=200,default='sina_tb')
+	owner = models.ManyToManyField(User,related_name="owner")

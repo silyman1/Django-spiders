@@ -22,8 +22,8 @@ class SinaSpider(Spider):
 		page_id_list = sinalogin.get_myfollowers_page_id()
 		return page_id_list
 	def start_requests(self):
-		page_id_list = self.get_pageid_list()
-		for page_id in page_id_list:
+		for page_id in self.get_pageid_list():
+			print '@@@@@@',page_id
 			new_id = '107603' + page_id[6:]
 			page_num = pipelines.DjangospidersPipeline.get_page_num_by_pid(new_id)
 			url = 'https://m.weibo.cn/api/container/getIndex?containerid='+ new_id + '&page='+str(page_num)
@@ -49,7 +49,7 @@ class SinaSpider(Spider):
 					brief_tmp = ''
 					item['itemid'] = info.get('itemid')
 					item['author'] = info.get('mblog').get('user').get('screen_name')
-					print item['author'].encode('utf-8')
+					print item['author']
 					item['post_detail'] = info.get('scheme')
 					item['post_time'] = info.get('mblog').get('created_at')
 					item['comments_count'] = info.get('mblog').get('comments_count')	
@@ -74,11 +74,13 @@ class SinaSpider(Spider):
 
 			num = re.findall(r'&page=(\d+)',rawurl)[0]
 			pid = re.findall(r'containerid=(\d+)',rawurl)[0]
+			print pid
 			pipelines.DjangospidersPipeline.process_page_id(pid,num)
 			new_num = int(num)+1
 			nexturl = rawurl.replace('&page='+num,'&page='+str(new_num))
 			print '%%%%%%%%%%%%%%%%%%%'
 			print nexturl
+			fo.close()
 			sys.stdout = __stdout__
 			yield Request(nexturl,cookies =self.cookies)
 		# for info in weibo_info:

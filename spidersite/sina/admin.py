@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from .models import User,Following_Blogger,Related_tb_name
+from .models import User,Following_Blogger
 # Register your models here.
 import sys
 reload(sys)
@@ -12,4 +12,3 @@ class BloggerAdmin(admin.ModelAdmin):
     ]
 admin.site.register(User)
 admin.site.register(Following_Blogger,BloggerAdmin)
-admin.site.register(Related_tb_name)

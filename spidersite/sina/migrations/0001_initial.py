@@ -2,9 +2,10 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import django.utils.timezone
-import django.core.validators
 import django.contrib.auth.models
+import django.utils.timezone
+from django.conf import settings
+import django.core.validators
 
 
 class Migration(migrations.Migration):
@@ -32,6 +33,8 @@ class Migration(migrations.Migration):
                 ('nickname', models.CharField(default=b'\xe7\x94\xa8\xe6\x88\xb7', max_length=200)),
                 ('last_seen', models.DateTimeField(auto_now_add=True)),
                 ('avatar', models.CharField(default=b'avatar-default.jpg', max_length=200)),
+                ('sina_username', models.CharField(max_length=200)),
+                ('sina_password', models.CharField(max_length=200)),
                 ('groups', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', verbose_name='groups')),
                 ('user_permissions', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Permission', blank=True, help_text='Specific permissions for this user.', verbose_name='user permissions')),
             ],
@@ -50,13 +53,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('following_name', models.CharField(max_length=200)),
                 ('avatar', models.CharField(default=b'avatar-default.jpg', max_length=200)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Related_tb_name',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('tb_name', models.CharField(default=b'sina_tb', max_length=200)),
+                ('owner', models.ManyToManyField(related_name='owner', to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

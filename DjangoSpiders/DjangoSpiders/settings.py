@@ -14,7 +14,10 @@ BOT_NAME = 'DjangoSpiders'
 SPIDER_MODULES = ['DjangoSpiders.spiders']
 NEWSPIDER_MODULE = 'DjangoSpiders.spiders'
 
-
+# settings
+DOWNLOAD_DELAY = 0.25    # 250 ms of delay
+RETRY_TIMES = 8
+#DEPTH_LIMIT = 2
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'DjangoSpiders (+http://www.yourdomain.com)'
 

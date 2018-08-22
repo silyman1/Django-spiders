@@ -32,13 +32,21 @@ class DjangospidersPipeline(object):
 		return heat_count
 	@classmethod
 	def process_page_id(cls,page_id,page_num):
-		page_id = int(page_id)
+		fo = open('pageid.log','a+')
+		__stdout__ = sys.stdout
+		sys.stdout = fo
+		page_id = MySQLdb.escape_string(str(page_id))
 		page_num =  int(page_num)
 		sql.Sinadb.create_pageid_tb()	
 		sql.Sinadb.insert_pageid_tb(page_id,page_num)
+		sys.stdout = __stdout__
 	@classmethod
 	def get_page_num_by_pid(cls,page_id):
+		fo = open('getpageid.log','a+')
+		__stdout__ = sys.stdout
+		sys.stdout = fo
 		page_id = int(page_id)
 		sql.Sinadb.create_pageid_tb()
 		page_num = sql.Sinadb.get_page_num(page_id)
+		sys.stdout = __stdout__
 		return page_num

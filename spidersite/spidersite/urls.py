@@ -7,7 +7,7 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^sina/', include('sina.urls')),
+    url(r'^sina/', include('sina.urls',namespace="sina")),
     url(r'^accounts/login/$', login_view),
     url(r'^accounts/logout/$', logout_view),
     url(r'^register_sina/', register_view),   

@@ -45,7 +45,7 @@ class DjangospidersPipeline(object):
 		fo = open('getpageid.log','a+')
 		__stdout__ = sys.stdout
 		sys.stdout = fo
-		page_id = int(page_id)
+		page_id = str(page_id)
 		sql.Sinadb.create_pageid_tb()
 		page_num = sql.Sinadb.get_page_num(page_id)
 		sys.stdout = __stdout__

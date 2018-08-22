@@ -8,7 +8,7 @@ class Sql(object):
 	
 	@classmethod	
 	def connect_db(cls):
-		db = MySQLdb.connect(host=MYSQL_HOSTS,user=MYSQL_USER,passwd=MYSQL_PASSWORD,db=MYSQL_DB)
+		db = MySQLdb.connect(host=MYSQL_HOSTS,user=MYSQL_USER,passwd=MYSQL_PASSWORD,db=MYSQL_DB,charset='utf8')
 		cursor = db.cursor()
 		return db,cursor
 
@@ -28,4 +28,5 @@ class Sql(object):
 		return results
 	@classmethod
 	def close_db(cls,db):
-		db
+		db.close()
+		print 'close db !'

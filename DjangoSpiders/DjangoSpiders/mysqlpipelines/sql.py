@@ -20,7 +20,8 @@ class Sinadb(object):
 			`comments_count` int,
 			`attitudes_count` int,
 			`heat_count` int,
-			`itemid` VARCHAR(255))DEFAULT CHARSET=utf8;"""
+			`itemid` VARCHAR(255),
+			`click_count` int)DEFAULT CHARSET=utf8;"""
 		try:
 			cursor.execute(sql)
 		except MySQLdb.Error,e:
@@ -38,30 +39,30 @@ class Sinadb(object):
 		print results
 		if results == ():
 			sql = "INSERT INTO sina_tb(author,author_brief,post,post_detail,post_time,comments_count,attitudes_count,heat_count,itemid)VALUES ('%s','%s','%s','%s','%s','%d','%d','%d','%s')"%(author,author_brief,post,post_detail,post_time,comments_count,attitudes_count,heat_count,itemid)
-			try:
-				result = cursor.execute(sql)
-				if result:
-					print 'insert NO.%d data'%db.insert_id()
-				else:
-					print 'rolling back..................'
-					db.rollback()
-				db.commit()
-				# if self.db.insert_id()>=200:
-				# 	return 'stop'
-				# else:
-				# 	return 'continue'
-			except MySQLdb.Error,e:
-				print time.strftime('[%Y-%m-%d %H:%M:%S]', time.localtime(time.time())),'insert data error...reason:',e
 		else:
-			print 'this item already exists ...'
-
-			
+			sql ="UPDATE sina_tb SET post_time='%s',comments_count='%d',attitudes_count='%d',heat_count='%d' WHERE itemid = '%s'"%(post_time,comments_count,attitudes_count,heat_count,itemid)
+			print 'this item already exists ...update it'	
+		try:
+			result = cursor.execute(sql)
+			if result:
+				print 'insert NO.%d data'%db.insert_id()
+			else:
+				print 'rolling back..................'
+				db.rollback()
+			db.commit()
+			# if self.db.insert_id()>=200:
+			# 	return 'stop'
+			# else:
+			# 	return 'continue'
+		except MySQLdb.Error,e:
+			print time.strftime('[%Y-%m-%d %H:%M:%S]', time.localtime(time.time())),'insert data error...reason:',e
+		
 		sql2 = "SELECT * FROM sina_tb WHERE itemid = '%s'"%itemid
 		cursor.execute(sql2)
 		results = cursor.fetchall()
 		print 'results0:',results[0][0]
 		print 'results1:',results[0][1]
-		print 'results2:',results[0][2]
+		print 'results2:',results[0][3]
 		print 'results6:',results[0][6]
 		print 'results7:',results[0][7]
 		print 'results8:',results[0][8]

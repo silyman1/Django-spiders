@@ -8,6 +8,7 @@ import binascii
 import random
 import rsa
 import urllib
+import json
 # from bs4 import BeautifulSoup
 import sys
 reload(sys)
@@ -21,7 +22,7 @@ class SinaLogin(object):
 
 		self.uid = 0
 		self.session = requests.session()
-
+		self.page_id_list = set()
 		self.s = self.session.get('http://login.sina.com.cn',headers=self.headers)
 		self.following_list = []
 		if(self.s.status_code == 200):
@@ -136,6 +137,64 @@ class SinaLogin(object):
 				
 			return True
 		return False
+	def get_others_homepage(self,uid):
+		home_url = 'https://weibo.com/u/{}/home?wvr=5'.format(str(uid))
+		home_page = self.session.get(home_url).text
+		return home_page
+	def get_unique_page_id(self,uid):
+		print 'uid:',uid
+		html = self.get_others_homepage(uid)
+		# with open('ttt.txt','w+') as f:
+		# 	f.write(html)
+		pattern  = re.compile("CONFIG\[\'page_id\'\]=\'(\d+)\'",re.S)
+		page_id = re.findall(pattern,html)[0]
+		return page_id
+	def get_myfollowers_page_id(self):
+		print '+++++++++'
+		home_page = self.get_homepage()
+		pattern = re.compile(r'<fieldset>.*?href=\\"\\/p\\/(.*?)\\/myfollow',re.S)
+		page_id = re.findall(pattern, home_page)[0]
+		flag = True
+		i =1
+		requests.adapters.DEFAULT_RETRIES = 10
+		page_id_list = []
+		while flag:
+			# f = open('sina%d.txt'%i,'w+')
+			# __stdout__ = sys.stdout
+			# sys.stdout = f
+			page_url = 'https://weibo.com/p/{}/myfollow?t=1&cfs=&Pl_Official_RelationMyfollow__92_page={}#Pl_Official_RelationMyfollow__92'.format(str(page_id),str(i))
+			print page_url
+			home_page = self.session.get(page_url).text
+
+			print '==========================='
+			#print home_page.encode('gbk','ignore')
+			# sys.stdout = __stdout__
+			# f.close()
+			uid_list = self.parse_myfollow_2(home_page)
+			if uid_list == []:
+				flag = False
+				break;
+			i = i+1
+			for uid in uid_list:
+
+				self.page_id_list.add(self.get_unique_page_id(uid))
+
+		return self.page_id_list
+			# return page_id_list
+	def parse_myfollow_2(self,html):
+		# soup = BeautifulSoup(html,'lxml')
+		# print soup.title
+
+		# following_list = soup.find_all('div',attrs={"class":"title W_fb W_autocut"})
+		pattern = re.compile(r'<div class=\\"title W_fb W_autocut \\".*?title=\\"(.*?)\\"',re.S)
+		following_list = re.findall(pattern, html)
+		pattern2 = re.compile(r'<p class=\\"btn_bed\\">.*?&uid=(\d+)&sex',re.S)
+		following_uid_list = re.findall(pattern2, html)
+
+		if following_list:
+			for item in following_list:
+				print item
+		return following_uid_list
 if __name__ == "__main__":
 	sinalogin = SinaLogin()
 	sinalogin.login()

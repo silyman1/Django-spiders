@@ -43,6 +43,20 @@ class Sql(object):
 		cursor.execute(sql,following_list)
 		results = cursor.fetchall()
 		return results
+	@classmethod	
+	def query_data_by_test(cls,cursor,following_name):
+		sql = "SELECT * FROM sina_tb WHERE author = '%s' LIMIT 10 " % following_name
+		print sql
+		cursor.execute(sql)
+		results = cursor.fetchall()
+		return results
+	@classmethod	
+	def query_data_by_all(cls,cursor):
+		sql = "SELECT * FROM sina_tb LIMIT 10 "
+		print sql
+		cursor.execute(sql)
+		results = cursor.fetchall()
+		return results
 	@classmethod
 	def close_db(cls,db):
 		db.close()

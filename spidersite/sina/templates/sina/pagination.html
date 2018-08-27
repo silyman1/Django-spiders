@@ -1,0 +1,38 @@
+    <div class="page">
+		<a title="Total record"  href="?page=1" ><b><span>首页</span></b></a>
+    {% if following_list.has_previous %}
+		    <span>
+	  <a href="?page={{following_list.previous_page_number}}" aria-label="Previous">
+	    <span aria-hidden="true">&laquo;</span>
+	  </a>
+	</span>
+	{%else%}
+	<span class="disabled">
+	    <span aria-hidden="true">&laquo;</span>
+	  </a>
+	</span>
+	{%endif%}
+	{%for pg in following_list.paginator.page_num_range %}
+	{%if following_list.number == pg %}
+	 <b>{{ pg }}</b>
+	{%else%}
+	 <span><a href="?page={{pg}}">{{ pg }}</a></span>
+	{%endif%}
+	{%endfor%}
+	{% if following_list.has_next %}
+	<span>
+	 <a href="?page={{following_list.next_page_number}}" aria-label="Next">
+	    <span aria-hidden="true">&raquo;</span>
+	  </a>
+	</span>
+	{%else%}
+	<span class="disabled">
+	 <span aria-hidden="true">&raquo;</span>
+	  </a>
+	</span>
+	{%endif%}
+		<span><a href="?page={{following_list.paginator.num_pages}}" >末页</a></span>&nbsp;&nbsp;
+	<span class="current">
+        <b >&nbsp;第 <span style = "color:#66CCFF;">{{ following_list.number }}</span> 页/共 {{ following_list.paginator.num_pages }} 页</b>
+    </span>
+</div>

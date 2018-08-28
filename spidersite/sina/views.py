@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import sql
+import json
 import MySQLdb
 import random
 from .models import User,Following_Blogger
@@ -161,10 +162,21 @@ def get_following_list(request):
 		following_list = p.page(p.num_pages)
 	return render(request,'sina/followinglist.html',{'following_list':following_list})
 def query_all_blogs(request):
+
+	return render(request,'sina/blogs.html',{'mood':1})
+def get_following_blogs(request,f_id):
+	following = get_object_or_404(Following_Blogger, pk=f_id)
+	author = following.following_name
+	brief = following.brief
+	avatar = following.avatar
+	return render(request,'sina/fblogs.html',{'bloger':author,'brief': brief,'avatar':avatar,'mood':1,'fid':f_id})		
+def all_ajax_blog(request):
+	offset = request.GET.get('offset')
+	size = request.GET.get('size')
 	following_list = request.user.owner.all()
 	blog_list = []
 	db,cursor = sql.Sql.connect_db()
-	blog_list_l = sql.Sql.query_data_by_all(cursor)
+	blog_list_l = sql.Sql.query_data_by_all(cursor,offset,size)
 	for c in blog_list_l:
 		item = {}
 		item['author'] = c[1]
@@ -173,15 +185,24 @@ def query_all_blogs(request):
 		item['post_time'] = c[5]
 		item['comments_count'] = c[6]
 		item['attitudes_count'] = c[7]
-		blog_list.append(item)
+		for f in following_list:
+			if f.following_name == item['author']:
+				item['avatar'] = f.avatar
+
+		if item.get('avatar'):
+			blog_list.append(item)
+		else:
+			continue
 	sql.Sql.close_db(db)
-	return render(request,'sina/blogs.html',{'blog_list':blog_list,'following_list':following_list})
-def get_following_blogs(request,f_id):
-	blog_list = []
+	j_ret = json.dumps(blog_list)
+	return HttpResponse(j_ret)
+def single_ajax_blog(request):
+	f_id = int(request.GET.get('fid'))
 	following = get_object_or_404(Following_Blogger, pk=f_id)
-	author = following.following_name
-	brief = following.brief
-	avatar = following.avatar
+	offset = request.GET.get('offset')
+	size = request.GET.get('size')
+	following_list = request.user.owner.all()
+	blog_list = []
 	db,cursor = sql.Sql.connect_db()
 	blog_list_l = sql.Sql.query_data_by_test(cursor,MySQLdb.escape_string(following.following_name))
 	for c in blog_list_l:
@@ -191,9 +212,11 @@ def get_following_blogs(request,f_id):
 		item['post_time'] = c[5]
 		item['comments_count'] = c[6]
 		item['attitudes_count'] = c[7]
+		item['avatar'] = f.avatar
 		blog_list.append(item)
 	sql.Sql.close_db(db)
-	return render(request,'sina/blogs.html',{'blog_list':blog_list,'bloger':author,'brief': brief,'avatar':avatar,'mood':1})		
+	j_ret = json.dumps(blog_list)
+	return HttpResponse(j_ret)
 def update_following(following_list,request):
 	sinalogin = SinaLogin()
 	sinalogin.login(request.user.sina_username,request.user.sina_password)

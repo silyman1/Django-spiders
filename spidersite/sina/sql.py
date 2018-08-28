@@ -51,9 +51,11 @@ class Sql(object):
 		results = cursor.fetchall()
 		return results
 	@classmethod	
-	def query_data_by_all(cls,cursor):
-		sql = "SELECT * FROM sina_tb LIMIT 10 "
+	def query_data_by_all(cls,cursor,offset,size): 
+		sql = "SELECT * FROM sina_tb WHERE `id` BETWEEN %d AND %d " % (int(offset),int(offset)+int(size)+1)
+
 		print sql
+		print '#######'
 		cursor.execute(sql)
 		results = cursor.fetchall()
 		return results

@@ -41,7 +41,7 @@
   function getData(offset,size){
     $.ajax({
       type: 'GET',
-      url: "{% url 'sina:all_ajax_blog' %}", 
+      url: "{% url 'sina:single_ajax_blog' %}", 
       data:{offset:offset,size:size},
       success: function(reponse){
         var data_list = JSON.parse(reponse);

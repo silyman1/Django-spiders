@@ -9,6 +9,8 @@
 <link href="{% static 'css/base.css' %}" rel="stylesheet">
 <link href="{% static 'css/index.css' %}" rel="stylesheet">
 <link href="{% static 'css/style.css' %}" rel="stylesheet">
+<script src="{% static 'js\jquery.min.js' %}"> </script>
+<script src="{% static 'js\jquery-1.11.3.min.js' %}"></script>
 {%if mood == 1 %}
 <link href="{% static 'css/mood.css' %}" rel="stylesheet">
 {%endif%}
@@ -25,7 +27,8 @@
 {%block content%}
 {%endblock%}
 <script type="text/javascript">
-window.onload= function (){
+window.onload = updatehtml
+ function updatehtml(){
   var arrEntities={'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'};
   detail_list = document.getElementsByName("detail");
   for(var i = 0;i<detail_list.length;i++)

@@ -7,7 +7,7 @@
   {%for f in following_list%}
    <h2><a href="{% url 'sina:following_blogs' f.id%}"  target="_blank">{{f.following_name}}</a></h2>
    <p class="dateview"><span>&nbsp;关注数：{{f.following_num}}</span><span>粉丝数：{{f.follower_num}}</span><span>发表微博数：[<a href="/news/life/">0</a>]</span>&nbsp;&nbsp;他/她的微博[<a href="https://m.weibo.cn/n/{{f.following_name}}" style = "color:#66CCFF;">链接</a>]</p>
-    <figure><a href="{% url 'sina:following_blogs' f.id%}"  target="_blank"><img src="{{f.avatar}}" class="img-circle"></a></span></p>
+    <figure><a href="{% url 'sina:following_blogs' f.id%}"  target="_blank"><img src="{{f.avatar}}" class="img-circle"></a></span></p></figure>
     <ul class="nlist">
       <p style = "color:#0099FF;">{{f.brief}}</p>
     </ul>

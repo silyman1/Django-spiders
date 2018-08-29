@@ -1,0 +1,33 @@
+{%extends "sina/base.html"%}
+{% load staticfiles %}
+{%block content%}
+<article class="blogs">
+  <div style="text-align: center;margin-right: 270px;"><a href="#"><img src = "/static/images/{{request.user.avatar}}"class = "image-circle"></a> </div>
+  <div class="index_about">
+    <h2 class="c_titile">昵称:<span style = "color:#66CCFF;">{{request.user.nickname}}</span></h2>
+    <p style="text-align: center;"><a href=""><span style="font-size:18px; color:#66FF33;">修改资料<span></a></p>
+    <br>
+    <p class="box_c"><span class="d_time">注册时间：{{request.user.user_register_time}}</span><span>上次登录：{{request.user.last_seen}}</span></p>
+    <br>
+    <p class="box_c"><span class="d_time">新浪账号：{{request.user.sina_username}}</span><span>新浪密码：***********</span></p>
+    <br>
+   <h2 ><span style = "color:#9999CC;">简介：</span></h2>
+    <ul class="infos">
+    </ul>
+  </div>  
+  <aside class="right">
+ 
+
+    <div class="visitors">
+      <h3>
+        <p>最近访客</p>
+      </h3>
+      <ul>
+      </ul>
+    </div>
+  </aside>
+</article>
+<footer>
+  <p>Design by DanceSmile <a href="http://www.miitbeian.gov.cn/" target="_blank">蜀ICP备11002373号-1</a> <a href="/">网站统计</a></p>
+</footer>
+{%endblock%}

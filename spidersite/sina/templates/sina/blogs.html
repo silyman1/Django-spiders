@@ -8,8 +8,8 @@
   </div>
 
 <footer>
-  <div id="more" >
-  加载更多
+  <div id="more" ><a href ="javascript:void(0)">
+  加载更多</a>
 </div>
   <div id="no-more" >
   没有更多数据了...
@@ -58,9 +58,13 @@
         
         /*使用for循环*/
         for(var i=0; i< size; i++){
-          result +='<ul class="arrow_box">'+ '<div class="sy">' +'<img src="' + data_list[i].avatar + '"> '+'<p name = "detail"><a href = "' + data_list[i].post_detail + '">' + data_list[i].post + '</a></p>'+ '</div>' +
+          str = '<a href={%url "sina:following_blogs" 0 %} target="_blank">'
+          str = str.replace('0',data_list[i].id);
+          result +='<ul class="arrow_box">'+ '<div class="sy">' +'<img src="' + data_list[i].avatar + '" class="image-circle"> '+'<p name = "detail"><a href = "' + data_list[i].post_detail + '" target="_blank">' + data_list[i].post + '</a></p>'+ '</div>' +
               '<span class="date-view">&nbsp;' + data_list[i].post_time +'</span>'+
-            '</ul>';
+            '<br><div>&emsp;&emsp;' + str + data_list[i].author + '</a>' +
+            '<span>&emsp;他/她的[<a href="https://m.weibo.cn/n/'+ data_list[i].author +'" style = "color:#66CCFF;">微博</a>]</span>'+'<span>&emsp;&emsp;&emsp;评论数:[<b style = "color:#66CCFF;">'+data_list[i].comments_count+'</b>]</span>'+ '<span>&emsp;&emsp;&emsp;点赞数:[<b style = "color:#66CCFF;">'+data_list[i].attitudes_count+'</b>]</span>' + '</div></ul>';
+
         }
 
         $('.bloglist').append(result);

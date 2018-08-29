@@ -44,8 +44,8 @@ class Sql(object):
 		results = cursor.fetchall()
 		return results
 	@classmethod	
-	def query_data_by_test(cls,cursor,following_name):
-		sql = "SELECT * FROM sina_tb WHERE author = '%s' LIMIT 10 " % following_name
+	def query_data_by_single(cls,cursor,following_name,offset,size):
+		sql = "SELECT * FROM sina_tb WHERE author = '%s' LIMIT %d,%d " % (following_name,int(offset),int(size))
 		print sql
 		cursor.execute(sql)
 		results = cursor.fetchall()

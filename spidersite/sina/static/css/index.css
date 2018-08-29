@@ -190,8 +190,8 @@ opacity:1;
 .template h3 p span { color: #38b3d4; }
 .template ul { overflow: hidden; }
 .template ul li { margin: 3px; float: left; display: block; padding: 5px 5px 6px 5px; -webkit-transition: all 1s; -moz-transition: all 1s; -o-transition: all 1s; transition: all 1s; }
-.template li img { width: 142px; height: 80px; background: #FFF; padding: 4px; box-shadow: 0px 0px 2px rgba(0,0,0,.5); display: block; }
-.template li span { color: #F1F0EE; display: block; text-align: center; margin-top: 5px; width: 142px; overflow: hidden; text-overflow: ellipsis; height: 14px }
+.template li img { width: 80px; height: 80px; background: #FFF; padding: 4px; box-shadow: 0px 0px 2px rgba(0,0,0,.5); display: block; }
+.template li span { color: #F1F0EE; display: block; text-align: center; margin-top: 5px; width: 105px; overflow: hidden; text-overflow: ellipsis; height: 14px }
 .template li:hover { background: #666; padding: 5px 5px 6px 5px; }
 h2.title_tj { font: 18px "Î¢ÈíÑÅºÚ", Arial, Helvetica, sans-serif; color: #444; font-weight: bold; background: url(../images/h_line.jpg) repeat-x 20px center; }
 h2.title_tj span { color: #FE5187 }
@@ -199,7 +199,7 @@ h2.title_tj p { background: #fff; width: 90px }
 .bloglist { width: 740px; overflow: hidden; background: url(../images/r_line.jpg) repeat-y right; }
 .bloglist h3 { margin: 20px 0 10px 0; color: #333 }
 .bloglist figure { float: left; width: 183px; }
-.bloglist figure img { padding: 4px; border: #f4f2f2 1px solid; width: 175px; }
+
 .bloglist ul { float: left; width: 520px; margin: 10px 0px 0 15px; line-height: 20px; }
 .dateview { width: 695px; overflow: hidden; clear: both; margin: 10px 0 0 0; display: inline-block; background: #f6f6f6 url(../images/time.jpg) 15px center no-repeat; line-height: 26px; height: 26px; color: #838383; padding-left: 25px }
 .dateview span { margin: 0 10px; }
@@ -221,4 +221,9 @@ a.readmore { background: #fd8a61; color: #fff; padding: 5px 10px; float: right; 
 .website { margin: 10px 0; background: #F3F3F3; border-radius: 50%; text-align: center; }
 .website li { line-height: 26px; text-shadow: #fff 1px 1px 1px; height: 26px; }
 .weixin { background: url(../images/weixin.jpg) no-repeat; width: 100%; display: inline-block; height: 274px; overflow: hidden; margin: 10px 0; clear: both }
-
+.image-circle{
+	margin-top: 10px; 
+	width:80px; 
+	height:80px; 
+	border-radius:50%; 
+}

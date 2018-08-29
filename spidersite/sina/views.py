@@ -5,10 +5,12 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from PIL import Image
 import sql
 import json
 import MySQLdb
 import random
+from .forms import EditForm
 from .models import User,Following_Blogger
 from django.utils import timezone
 import sys
@@ -109,7 +111,7 @@ def index(request):
 	for t in range(len(following_list)):
 		i = random.randint(1, len(following_list)-1)
 		random_list.add(following_list[i])
-		if len(random_list)>=6:
+		if len(random_list) > 7:
 			break
 	print random_list
 	for following in following_list:
@@ -188,8 +190,8 @@ def all_ajax_blog(request):
 		for f in following_list:
 			if f.following_name == item['author']:
 				item['avatar'] = f.avatar
-
-		if item.get('avatar'):
+				item['id'] = f.id
+ 		if item.get('avatar'):
 			blog_list.append(item)
 		else:
 			continue
@@ -204,19 +206,64 @@ def single_ajax_blog(request):
 	following_list = request.user.owner.all()
 	blog_list = []
 	db,cursor = sql.Sql.connect_db()
-	blog_list_l = sql.Sql.query_data_by_test(cursor,MySQLdb.escape_string(following.following_name))
+	blog_list_l = sql.Sql.query_data_by_single(cursor,MySQLdb.escape_string(following.following_name),offset,size)
 	for c in blog_list_l:
 		item = {}
+		item['author'] = c[1]
 		item['post'] = c[3]
 		item['post_detail'] = c[4]
 		item['post_time'] = c[5]
 		item['comments_count'] = c[6]
 		item['attitudes_count'] = c[7]
-		item['avatar'] = f.avatar
+		item['avatar'] = following.avatar
+		item['id'] = f_id
 		blog_list.append(item)
 	sql.Sql.close_db(db)
 	j_ret = json.dumps(blog_list)
 	return HttpResponse(j_ret)
+def about_me(request):
+	return render(request,'sina/about_me.html')
+@csrf_exempt
+@login_required
+def edit(request):
+
+	if request.method == 'POST':
+		editform =EditForm(request.POST)
+		if editform.is_valid():
+			request.user.nickname =editform.cleaned_data['nickname']
+			request.user.password =editform.cleaned_data['password']
+			request.user.sina_username =editform.cleaned_data['sina_username']
+			request.user.sina_password =editform.cleaned_data['sina_password']
+			request.user.brief =editform.cleaned_data['brief']
+			try:
+				avatar = request.FILES['file0']
+
+				img = Image.open(avatar)
+				print 'test2'
+				img.thumbnail((500,500),Image.ANTIALIAS)
+				name = avatar.name
+				for type in ['gif','jpeg','jpg','png','JPG']:
+					if avatar.name.endswith(type):
+						img.save("E:\\gitprojects\\myblog2\\myblog\\blog\\static\\images\\%s"%name)
+						break
+					else:
+						raise 'wrong type img'
+						print 'nonono'
+			except Exception,e:
+				return HttpResponse("Error %s"%e)#异常，查看报错信息
+			request.user.avatar = name
+			request.user.save()
+			print u'修改成功'
+			return redirect(reverse('sina:about_me'))
+		else:
+			print editform.errors
+			print u'w无效'
+		return render(request,'sina/edit.html',{"editform":editform})
+	else:
+		data = {'username':request.user.username,'email':request.user.email,'mysignature':request.user.mysignature}
+		editform =EditForm(initial =data)
+		return render(request,'sina/edit.html',{"editform":editform})
+
 def update_following(following_list,request):
 	sinalogin = SinaLogin()
 	sinalogin.login(request.user.sina_username,request.user.sina_password)

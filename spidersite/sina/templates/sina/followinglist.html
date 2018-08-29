@@ -5,11 +5,12 @@
 <h1 class="t_nav"><span>“慢生活”不是懒惰，放慢速度不是拖延时间，而是让我们在生活中寻找到平衡。</span><a href="/" class="n1">按时间</a><a href="/" class="n2">待定</a></h1>
 <div class="newblog left">
   {%for f in following_list%}
-   <h2><a href="{% url 'sina:following_blogs' f.id%}"  target="_blank">{{f.following_name}}</a></h2>
+   <h2><a href="{% url 'sina:following_blogs' f.id%}"  target="_blank">&nbsp;&nbsp;{{f.following_name}}</a></h2>
    <p class="dateview"><span>&nbsp;关注数：{{f.following_num}}</span><span>粉丝数：{{f.follower_num}}</span><span>发表微博数：[<a href="/news/life/">0</a>]</span>&nbsp;&nbsp;他/她的微博[<a href="https://m.weibo.cn/n/{{f.following_name}}" style = "color:#66CCFF;">链接</a>]</p>
-    <figure><a href="{% url 'sina:following_blogs' f.id%}"  target="_blank"><img src="{{f.avatar}}" class="img-circle"></a></span></p></figure>
+    <figure><a href="{% url 'sina:following_blogs' f.id%}"  target="_blank"><img src="{{f.avatar}}" class="image-circle"></a></span></p></figure>
     <ul class="nlist">
-      <p style = "color:#0099FF;">{{f.brief}}</p>
+      <br>
+      <p style = "color:#0099FF;">&nbsp;&nbsp;{{f.brief}}</p>
     </ul>
     <div class="blank"></div>
     <div class="line"></div>

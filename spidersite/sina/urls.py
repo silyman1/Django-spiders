@@ -12,4 +12,6 @@ urlpatterns = [
     url(r'^query_all/ajax_blog',views.all_ajax_blog, name = 'all_ajax_blog'),
     url(r'^query_single/ajax_blog',views.single_ajax_blog, name = 'single_ajax_blog'), 
     url(r'^query_all/', views.query_all_blogs, name='query_all'),
+    url(r'^about_me/', views.about_me, name='about_me'),
+    url(r'^edit/', views.edit, name='edit'),
 ]

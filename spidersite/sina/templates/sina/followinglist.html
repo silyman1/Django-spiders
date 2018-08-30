@@ -23,10 +23,13 @@
 <aside class="right">
 <br>
       <h3><p>最近访问的博主:</p></h3>
-      <ul>
-
+      {%for r in recent%}
+      <ul class="rank">
+      <li>
+        <img src="{{r.avatar}}" class="image-circle2">
+        <a href="{% url 'sina:following_blogs' r.id%}">{{r.following_name}}</a></li>
       </ul>
-
+      {%endfor%}
 </aside>
 </article>
 <footer>

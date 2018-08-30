@@ -1,14 +1,14 @@
 {%extends "sina/base.html"%}
 {% load staticfiles %}
 {%block content%}
-<div class="banner">
+<div class="banner" style="background: url(../../static/images/b2.jpg)">
   <section class="box">
     <ul class="texts">
       <p>..............。</p>
       <p>!!!!!!!!!!!!!!!!</p>
       <p>################</p>
     </ul>
-    <div class="avatar"><a href="#"><span>peng</span></a> </div>
+    <div class="avatar" style= "background: url(../../static/images/{{request.user.avatar}})"><a href="#"><span>{{request.user.nickname}}</span></a> </div>
   </section>
 </div>
 <div class="template">
@@ -83,6 +83,5 @@ document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static
 <footer>
   <p>Design by DanceSmile <a href="http://www.miitbeian.gov.cn/" target="_blank">蜀ICP备11002373号-1</a> <a href="/">网站统计</a></p>
 </footer>
-<script src="{% static 'js/silder.js' %}"></script>
 
 {%endblock%}

@@ -2,10 +2,10 @@
 {% load staticfiles %}
 {%block content%}
 <article class="blogs">
-  <div style="text-align: center;margin-right: 270px;"><a href="#"><img src = "/static/images/{{request.user.avatar}}"class = "image-circle"></a> </div>
+  <div style="text-align: center;margin-right: 270px;"><a href="#"><img src = "/static/images/{{request.user.avatar}}"class = "image-circle" id = "avatar"></a> </div>
   <div class="index_about">
     <h2 class="c_titile">昵称:<span style = "color:#66CCFF;">{{request.user.nickname}}</span></h2>
-    <p style="text-align: center;"><a href=""><span style="font-size:18px; color:#66FF33;">修改资料<span></a></p>
+    <p style="text-align: center;"><a href="{%url 'sina:edit'%}"><span style="font-size:18px; color:#66FF33;">修改资料<span></a></p>
     <br>
     <p class="box_c"><span class="d_time">注册时间：{{request.user.user_register_time}}</span><span>上次登录：{{request.user.last_seen}}</span></p>
     <br>
@@ -13,6 +13,7 @@
     <br>
    <h2 ><span style = "color:#9999CC;">简介：</span></h2>
     <ul class="infos">
+      {{request.user.brief}}
     </ul>
   </div>  
   <aside class="right">

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for spidersite project.
 
@@ -75,6 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'spidersite.wsgi.application'
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'#改变序列化方式以支持模型序列化
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases

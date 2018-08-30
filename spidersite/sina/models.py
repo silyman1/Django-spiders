@@ -20,3 +20,22 @@ class Following_Blogger(models.Model):
 	click_count = models.IntegerField(null=True,default=0)
 	following_num = models.IntegerField(null=True,default=0)
 	follower_num = models.IntegerField(null=True,default=0)
+class Recent_Visit(object):
+	def __init__(self):
+		self.visit_list= []
+	def add_item(self,following_blogger):
+		print '###',following_blogger
+		i = 0
+		for item in self.visit_list:
+			if item.id == following_blogger.id:
+				del self.visit_list[i]
+				break;
+			else:
+				print '##2#',following_blogger
+			i = i+1
+		self.visit_list.insert(0,following_blogger)
+		if len(self.visit_list)>8:
+			self.visit_list.pop()
+		print self.visit_list
+	def get_list(self):
+		return self.visit_list

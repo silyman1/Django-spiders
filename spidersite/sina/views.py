@@ -11,7 +11,7 @@ import json
 import MySQLdb
 import random
 from .forms import EditForm
-from .models import User,Following_Blogger
+from .models import User,Following_Blogger,Recent_Visit
 from django.utils import timezone
 import sys
 reload(sys)
@@ -88,6 +88,11 @@ def login_view(request):
 			user.last_seen = timezone.now()
 			user.save()
 			print user.last_seen
+			recent = request.session.get("recent",None)
+			if not recent:
+				recent = Recent_Visit()
+			request.session["recent"] = recent
+			print request.session["recent"] ,'@@@'
 			return redirect(reverse('sina:index'))
 		return render_to_response('sina/login.html')
 	else:
@@ -162,7 +167,9 @@ def get_following_list(request):
 		following_list = p.page(1)
 	except EmptyPage:
 		following_list = p.page(p.num_pages)
-	return render(request,'sina/followinglist.html',{'following_list':following_list})
+	recent = request.session.get("recent",None)
+	print 'recent:',recent
+	return render(request,'sina/followinglist.html',{'recent':recent.get_list(),'following_list':following_list})
 def query_all_blogs(request):
 
 	return render(request,'sina/blogs.html',{'mood':1})
@@ -171,6 +178,12 @@ def get_following_blogs(request,f_id):
 	author = following.following_name
 	brief = following.brief
 	avatar = following.avatar
+	recent = request.session.get("recent",None)
+	if not recent:
+		recent = Recent_Visit()
+	recent.add_item(following)
+	request.session["recent"] = recent
+	print '#########',recent.get_list()
 	return render(request,'sina/fblogs.html',{'bloger':author,'brief': brief,'avatar':avatar,'mood':1,'fid':f_id})		
 def all_ajax_blog(request):
 	offset = request.GET.get('offset')
@@ -231,7 +244,6 @@ def edit(request):
 		editform =EditForm(request.POST)
 		if editform.is_valid():
 			request.user.nickname =editform.cleaned_data['nickname']
-			request.user.password =editform.cleaned_data['password']
 			request.user.sina_username =editform.cleaned_data['sina_username']
 			request.user.sina_password =editform.cleaned_data['sina_password']
 			request.user.brief =editform.cleaned_data['brief']
@@ -239,15 +251,17 @@ def edit(request):
 				avatar = request.FILES['file0']
 
 				img = Image.open(avatar)
-				print 'test2'
+
 				img.thumbnail((500,500),Image.ANTIALIAS)
-				name = avatar.name
-				for type in ['gif','jpeg','jpg','png','JPG']:
-					if avatar.name.endswith(type):
-						img.save("E:\\gitprojects\\myblog2\\myblog\\blog\\static\\images\\%s"%name)
+				name = str(avatar.name)
+
+				for TYPE in ['gif','jpeg','jpg','png','JPG']:
+
+					if name.endswith(TYPE):
+						img.save("E:\\gitprojects\\%s"%name)
 						break
 					else:
-						raise 'wrong type img'
+						print  'wrong type img'
 						print 'nonono'
 			except Exception,e:
 				return HttpResponse("Error %s"%e)#异常，查看报错信息
@@ -260,7 +274,8 @@ def edit(request):
 			print u'w无效'
 		return render(request,'sina/edit.html',{"editform":editform})
 	else:
-		data = {'username':request.user.username,'email':request.user.email,'mysignature':request.user.mysignature}
+		print 'eeeee'
+		data = {'nickname':request.user.nickname,'sina_username':request.user.sina_username,'sina_password':request.user.sina_password,'brief':request.user.brief}
 		editform =EditForm(initial =data)
 		return render(request,'sina/edit.html',{"editform":editform})
 

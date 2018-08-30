@@ -2,19 +2,23 @@
 {% load staticfiles %}
 {%block content%}
 <article class="blogs">
-  <div style="text-align: center;margin-right: 270px;"><a href="#"><img src = "/static/images/{{request.user.avatar}}"class = "image-circle"></a> </div>
+<form action="{%url 'sina:edit'%}" method="post" enctype="multipart/form-data" name ="edit">
+  <div style="text-align: center;margin-right: 270px;"><a href="#"><img src = "/static/images/{{request.user.avatar}}"class = "image-circle" id ="img0"></a> </div>
+  <p style="text-align: center;margin-right: 270px;"><input type="file" name="file0" id="file0" value= "更换头像" /></p>
   <div class="index_about">
-    <h2 class="c_titile">昵称:<span style = "color:#66CCFF;">{{request.user.nickname}}</span></h2>
-    <p style="text-align: center;"><a href=""><span style="font-size:18px; color:#66FF33;">修改资料<span></a></p>
+    <h2 class="c_titile">昵称:<span style = "color:#66CCFF;">{{editform.nickname}}</span></h2>
+
     <br>
-    <p class="box_c"><span class="d_time">注册时间：{{request.user.user_register_time}}</span><span>上次登录：{{request.user.last_seen}}</span></p>
     <br>
-    <p class="box_c"><span class="d_time">新浪账号：{{request.user.sina_username}}</span><span>新浪密码：***********</span></p>
+    <p class="box_c"><span class="d_time">新浪账号：{{editform.sina_username}}</span><span>新浪密码：{{editform.sina_password}}</span></p>
     <br>
    <h2 ><span style = "color:#9999CC;">简介：</span></h2>
     <ul class="infos">
+      {{editform.brief}}
     </ul>
-  </div>  
+          <p style="text-align: center; margin-right: 140px;"><input type="submit" value="保存"></p>
+  </div> 
+  </form> 
   <aside class="right">
  
 
@@ -30,4 +34,41 @@
 <footer>
   <p>Design by DanceSmile <a href="http://www.miitbeian.gov.cn/" target="_blank">蜀ICP备11002373号-1</a> <a href="/">网站统计</a></p>
 </footer>
+<script>    
+$("#file0").change(function(){ 
+
+ if (this.files.length>1){
+  alert("最多只能上传1张图片！");
+  window.location.reload();
+  }
+  else{
+  file = this.files[0];
+  if(file.type != "image/jpg" && file.type != "image/JPG" && file.type != "image/jpeg"&&file.type !="image/png"&&file.type !="image/gif"){ 
+            alert("图片类型必须是.gif,jpeg,jpg,png中的一种");
+      window.location.reload();
+            return;
+  }
+
+  var obj;
+  var objUrl = getObjectURL(this.files[0]) ; 
+   
+  if (objUrl) { 
+
+    $("#img0").attr("src", objUrl) ;  
+  }  
+
+}
+}) ;    
+function getObjectURL(file) {  
+  var url = null ;   
+  if (window.createObjectURL!=undefined) { // basic  
+    url = window.createObjectURL(file) ;  
+  } else if (window.URL!=undefined) { // mozilla(firefox)  
+    url = window.URL.createObjectURL(file) ;  
+  } else if (window.webkitURL!=undefined) { // webkit or chrome  
+    url = window.webkitURL.createObjectURL(file) ;  
+  }  
+  return url ;  
+}  
+</script>
 {%endblock%}

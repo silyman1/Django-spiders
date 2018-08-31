@@ -33,44 +33,13 @@ class SinaSpider(Spider):
 		content = json.loads(response.body)
 		status = content.get('ok')
 
-		fo = open('sina.log','a+')
-		__stdout__ = sys.stdout
-		sys.stdout = fo
+		# fo = open('sina.log','a+')
+		# __stdout__ = sys.stdout
+		# sys.stdout = fo
 		rawurl = response.url
-		print '###############'
-		print rawurl
-		print status
 
 		if status == 1:
-			weibo_info =content.get('data').get('cards')
-			print '11111'
-			for info in weibo_info:
-				try:
-					brief_tmp = ''
-					item['itemid'] = info.get('itemid')
-					item['author'] = info.get('mblog').get('user').get('screen_name')
-					print item['author']
-					item['post_detail'] = info.get('scheme')
-					item['post_time'] = info.get('mblog').get('created_at')
-					item['comments_count'] = info.get('mblog').get('comments_count')	
-					item['attitudes_count'] = info.get('mblog').get('attitudes_count')
-					print '#############',item['comments_count'],item['attitudes_count']				
-					if info.get('mblog').get('user').get('verified_reason'):
-						brief_tmp = brief_tmp +  info.get('mblog').get('user').get('verified_reason') + '<br>'
-					if info.get('mblog').get('user').get('description'):
-						brief_tmp = brief_tmp +  info.get('mblog').get('user').get('description')	
-					item['author_brief'] = brief_tmp
-
-					if info.get('mblog').get('text'):
-						item['post'] = 	info.get('mblog').get('text')	
-					else:
-						item['post'] = '' 
-					print item['post'].encode('utf-8')
-				except Exception:
-					self.error_url.add(rawurl)
-					print 'error_list:',self.error_url
-					raise Exception
-				yield item 
+			author = content.get('data').get('cards')[0].get('mblog').get('user').get('screen_name')
 
 			num = re.findall(r'&page=(\d+)',rawurl)[0]
 			pid = re.findall(r'containerid=(\d+)',rawurl)[0]
@@ -78,10 +47,44 @@ class SinaSpider(Spider):
 			pipelines.DjangospidersPipeline.process_page_id(pid,num)
 			new_num = int(num)+1
 			nexturl = rawurl.replace('&page='+num,'&page='+str(new_num))
+
 			print '%%%%%%%%%%%%%%%%%%%'
+			print pid
 			print nexturl
-			fo.close()
-			sys.stdout = __stdout__
+
+			print '###############'
+			print rawurl
+			print status
+			weibo_info =content.get('data').get('cards')
+			print '11111'
+			for info in weibo_info:
+				# try:
+				brief_tmp = ''
+				item['itemid'] = info.get('itemid')
+				item['author'] = info.get('mblog').get('user').get('screen_name')
+				print item['author']
+				item['post_detail'] = info.get('scheme')
+				item['post_time'] = info.get('mblog').get('created_at')
+				item['comments_count'] = info.get('mblog').get('comments_count')	
+				item['attitudes_count'] = info.get('mblog').get('attitudes_count')
+				print '#############',item['comments_count'],item['attitudes_count']				
+				if info.get('mblog').get('user').get('verified_reason'):
+					brief_tmp = brief_tmp +  info.get('mblog').get('user').get('verified_reason') + '<br>'
+				if info.get('mblog').get('user').get('description'):
+					brief_tmp = brief_tmp +  info.get('mblog').get('user').get('description')	
+				item['author_brief'] = brief_tmp
+
+				if info.get('mblog').get('text'):
+					item['post'] = 	info.get('mblog').get('text')	
+				else:
+					item['post'] = '' 
+				print item['post'].encode('utf-8')
+				# except Exception,e:
+				# 	self.error_url.add(rawurl)
+				# 	print 'error_list:',self.error_url
+				# 	print 'erer:',e
+				# 	raise Exception
+				yield item 
 			yield Request(nexturl,cookies =self.cookies)
 		# for info in weibo_info:
 		# 	print '========',i,'========='

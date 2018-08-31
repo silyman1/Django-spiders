@@ -20,7 +20,8 @@ RETRY_TIMES = 8
 #DEPTH_LIMIT = 2
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'DjangoSpiders (+http://www.yourdomain.com)'
-
+LOG_FILE = "mySpider.log"
+LOG_LEVEL = "INFO"
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 

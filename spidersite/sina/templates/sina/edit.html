@@ -4,9 +4,10 @@
 <article class="blogs">
 <form action="{%url 'sina:edit'%}" method="post" enctype="multipart/form-data" name ="edit">
   <div style="text-align: center;margin-right: 270px;"><a href="#"><img src = "/static/images/{{request.user.avatar}}"class = "image-circle" id ="img0"></a> </div>
-  <p style="text-align: center;margin-right: 270px;"><input type="file" name="file0" id="file0" value= "更换头像" /></p>
+  <br>
+  <p style="text-align: center;margin-right: 269px;">    <a href="javascript:;" class="a-upload"><input type="file" name="file0" id="file0" value= "更换头像" />更换头像</a></p>
   <div class="index_about">
-    <h2 class="c_titile">昵称:<span style = "color:#66CCFF;">{{editform.nickname}}</span></h2>
+    <h2 class="c_titile">昵称:<span style = "color:#66CCFF;" >{{editform.nickname}}</span></h2>
 
     <br>
     <br>
@@ -16,9 +17,8 @@
     <ul class="infos">
       {{editform.brief}}
     </ul>
-          <p style="text-align: center; margin-right: 140px;"><input type="submit" value="保存"></p>
+          <p style="text-align: center; margin-right: 140px;"><input type="submit" value="保存" id ="a-upload"></p>
   </div> 
-  </form> 
   <aside class="right">
  
 
@@ -29,7 +29,26 @@
       <ul>
       </ul>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
+   <div class="news">
+      <h3 class="ph">
+      <p>扫<span>微信:</span></p>
+    </h3>
+    <br>
+    <img src = "/static/images/{{request.user.barcode}}" id ="img1">
+    <br>
+    <br>
+    <p style="text-align: center;margin-right: 20px;"> 
+    <a href="javascript:;" class="a-upload">
+      <input type="file" name="file1" id="file1" value= "更改二维码" />更改二维码
+    </a>
+  </p>
+  </div>
   </aside>
+  </form> 
 </article>
 <footer>
   <p>Design by DanceSmile <a href="http://www.miitbeian.gov.cn/" target="_blank">蜀ICP备11002373号-1</a> <a href="/">网站统计</a></p>
@@ -55,6 +74,30 @@ $("#file0").change(function(){
   if (objUrl) { 
 
     $("#img0").attr("src", objUrl) ;  
+  }  
+
+}
+}) ;    
+$("#file1").change(function(){ 
+
+ if (this.files.length>1){
+  alert("最多只能上传1张图片！");
+  window.location.reload();
+  }
+  else{
+  file = this.files[0];
+  if(file.type != "image/jpg" && file.type != "image/JPG" && file.type != "image/jpeg"&&file.type !="image/png"&&file.type !="image/gif"){ 
+            alert("图片类型必须是.gif,jpeg,jpg,png中的一种");
+      window.location.reload();
+            return;
+  }
+
+  var obj;
+  var objUrl = getObjectURL(this.files[0]) ; 
+   
+  if (objUrl) { 
+
+    $("#img1").attr("src", objUrl) ;  
   }  
 
 }

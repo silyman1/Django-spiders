@@ -97,6 +97,7 @@ def login_view(request):
 		return render_to_response('sina/login.html')
 	else:
 		return render_to_response('sina/login.html')
+@login_required
 def logout_view(request):
 	logout(request)
 	return render_to_response('sina/login.html')
@@ -154,6 +155,7 @@ def index(request):
 	sql.Sql.close_db(db)
 	sys.stdout = __stdout__ 
 	return render(request,'sina/index.html',{'following_list':following_list,'random_list':random_list,'hot_list':hot_list,'comments_count_list':comments_count_list,'attitudes_count_list':attitudes_count_list})
+@login_required
 def get_following_list(request):
 	following_list = request.user.owner.all()
 	page = request.GET.get('page')
@@ -170,9 +172,11 @@ def get_following_list(request):
 	recent = request.session.get("recent",None)
 	print 'recent:',recent
 	return render(request,'sina/followinglist.html',{'recent':recent.get_list(),'following_list':following_list})
+@login_required
 def query_all_blogs(request):
 
 	return render(request,'sina/blogs.html',{'mood':1})
+@login_required
 def get_following_blogs(request,f_id):
 	following = get_object_or_404(Following_Blogger, pk=f_id)
 	author = following.following_name
@@ -234,6 +238,7 @@ def single_ajax_blog(request):
 	sql.Sql.close_db(db)
 	j_ret = json.dumps(blog_list)
 	return HttpResponse(j_ret)
+@login_required
 def about_me(request):
 	return render(request,'sina/about_me.html')
 @csrf_exempt
@@ -248,24 +253,37 @@ def edit(request):
 			request.user.sina_password =editform.cleaned_data['sina_password']
 			request.user.brief =editform.cleaned_data['brief']
 			try:
-				avatar = request.FILES['file0']
+				avatar = request.FILES.get('file0',None)
+				barcode = request.FILES.get('file1',None)
+				if avatar:
+					img = Image.open(avatar)
+					img.thumbnail((500,500),Image.ANTIALIAS)
+					name = str(avatar.name)
+					for TYPE in ['gif','jpeg','jpg','png','JPG']:
 
-				img = Image.open(avatar)
+						if name.endswith(TYPE):
+							img.save("E:\\gitprojects\\%s"%name)
+							break
+						else:
+							print  'wrong type img'
+							print 'nonono'
+					request.user.avatar = name
+				if barcode:
+					img2 = Image.open(barcode)
+					img2.thumbnail((250,274),Image.ANTIALIAS)
+					name2 = barcode.name.encode('utf-8')
+					for TYPE in ['gif','jpeg','jpg','png','JPG']:
 
-				img.thumbnail((500,500),Image.ANTIALIAS)
-				name = str(avatar.name)
-
-				for TYPE in ['gif','jpeg','jpg','png','JPG']:
-
-					if name.endswith(TYPE):
-						img.save("E:\\gitprojects\\%s"%name)
-						break
-					else:
-						print  'wrong type img'
-						print 'nonono'
+						if name2.endswith(TYPE):
+							img2.save(u"E:\\gitprojects\\django-spiders\\spidersite\\sina\\static\\images\\%s"%name2)
+							break
+						else:
+							print  'wrong type barcode'
+							print 'nonono'
+					request.user.barcode = name2
 			except Exception,e:
 				return HttpResponse("Error %s"%e)#异常，查看报错信息
-			request.user.avatar = name
+
 			request.user.save()
 			print u'修改成功'
 			return redirect(reverse('sina:about_me'))

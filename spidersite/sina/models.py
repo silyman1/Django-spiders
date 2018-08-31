@@ -11,6 +11,7 @@ class User(AbstractUser,models.Model):
 	sina_username = models.CharField(max_length=200)
 	sina_password = models.CharField(max_length=200)
 	brief = models.CharField(max_length=200,default='暂无')
+	barcode = models.CharField(max_length=200,default='weixin.jpg')
 class Following_Blogger(models.Model):
 	following_name = models.CharField(max_length=200,)
 	avatar = models.CharField(max_length=200,default='avatar-default.jpg')

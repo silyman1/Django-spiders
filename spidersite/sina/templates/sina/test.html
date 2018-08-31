@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+    html, body, h1, form, fieldset, legend, ol ,li{
+        padding:0;
+        margin:0;
+    }
+    ol{
+        list-style:none;
+    }
+    body{
+        background:#fff;
+        color:#111;
+        padding:20px;
+    }
+    form#payment{
+        background:#9cbc2c;
+        -webkit-border-radius:5px;
+        border-radius:5px;
+        padding:20px;
+        width:400px;
+    }
+    form#payment fieldset{
+        border:none;
+        margin-bottom:10px;
+    }
+    form#payment fieldset:last-of-type{ margin-bottom:0; }
+    form#payment legend{
+        color:#384313;
+        font-size:16px;
+        font-weight:bold;
+        padding-bottom:10;
+        text-shadow:0px 1px 1px #c0d576;
+    }
+    form#payment > fieldset>legend:before{
+        content:"Step" counter(fieldset)":";
+        counter-increment:fieldsets;
+    }
+    form#payment fieldset fieldset legend{
+        color:#111;
+        font-size:13px;
+        font-weight:normal;
+        padding-bottom:0;
+    }
+    form#payment ol li{
+        background:#b9cf6a;
+        background:rgba(255, 255, 255, 0.3);
+        border:#e3ebc3;
+        border-color:rgba(255, 255, 255, 0.6);
+        border-style:solid;
+        border-width:2px;
+        -webkit-border-radius:5px;
+        line-height:30px;
+        padding:5px 10px;
+        margin-bottom:2px;
+    }
+    form#payment ol ol li{
+        bakcground:none;
+        border:none;
+        float:left;
+    }
+    form#payment label{
+        float:left;
+        font-size:13px;
+        width:110px;
+    }
+    form#payment fieldset fieldset label{
+        background:none no-repeat left 50%;
+        line-height:20px;
+        padding:0 0 0 30px;
+        width:auto;
+    }
+    form#payment fieldset fieldset label:hover{cursor:pointer;}
+    form#payment input:not([type=radio]), form#payment textarea{
+        background:#fff;
+        border:#fc3 solid 1px;
+        -webkit-border-radius:3px;
+        outline:none;
+        padding:5px;
+    }
+    </style>
+</head>
+<body>
+<form id=payment>
+    <fieldset>
+        <legend>用户详细资料</legend>
+        <ol>
+            <li>
+                <label for="name">用户名称：</label>
+                <input type="text" id="name" name="name" placeholder="请输入用户名" required autofocus>
+            </li>
+            <li>
+                <label for="email">邮件地址：</label>
+                <input type="text" name="email" id="email" placeholder="example@163.com" required>
+            </li>
+            <li>
+                <label for="phone">联系电话：</label>
+                <input type="tel" placeholder="010-12345678" id="phone" name="phone">
+            </li>
+        </ol>
+    </fieldset>
+ 
+    <fieldset>
+        <legend>Step1:家庭地址(收货地址)</legend>
+        <ol>
+            <li>
+                <label for="address">详细地址：</label>
+                <textarea name="address" id="address"  rows="1"></textarea>
+            </li>
+            <li>
+                <label for="postcode">邮政编码:</label>
+                <input type="text" id="postcode" name="postcode" required>
+            </li>
+            <li>
+                <label for="country">国  家:</label>
+                <input type="text" id="country" name="country" required>
+            </li>
+        </ol>
+    </fieldset>
+ 
+    <fieldset>
+        <legend>付费方式</legend>
+        <ol>
+            <li>
+                <fieldset>
+                    <lagend>信用卡类型</lagend>
+                    <ol>
+                        <li>
+                            <input type="radio" id="visa" name="cardtype">
+                            <label for="visa">中国工商银行</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="amex" name="cardtype">
+                            <label for="amex">中国人名银行</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="mastercard" name="cardtype">
+                            <label for="mastercard">中国建设银行</label>
+                        </li>
+                    </ol>
+                </fieldset>
+            </li>
+            <li>
+                <label for="cardnumber">银行卡号</label>
+                <input type="number" id="cardnumber" name="cardnumber" required>
+            </li>
+            <li>
+                <label for="secure">验 证 码：</label>
+                <input id="cardnumber" name="cardnumber" type="number" required>
+            </li>
+            <li>
+                <label for="namecard">持 卡 人：</label>
+                <input id="namecard" name="namecard" type="text" placeholder="却行是否该卡用户！" required>
+            </li>
+        </ol>
+    </fieldset>
+ 
+    <fieldset>
+        <button type="submit">现在购买</button>
+    </fieldset>
+</form>
+</body>
+</html>

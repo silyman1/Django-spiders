@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {%block content%}
 <div class="moodlist">
-  <h1 class="t_nav"><span>删删写写，回回忆忆，虽无法行云流水，却也可碎言碎语。</span><a href="/" class="n1">网站首页</a><a href="/" class="n2">碎言碎语</a></h1>
+  <h1 class="t_nav"><span>“慢生活”不是懒惰，放慢速度不是拖延时间，而是让我们在生活中寻找到平衡。</span><a href="{%url 'sina:index' %}" class="n1">网站首页</a><a href="/" class="n2">待定</a></h1>
   <div class="bloglist">
 
   </div>
@@ -45,7 +45,7 @@
       data:{offset:offset,size:size},
       success: function(reponse){
         var data_list = JSON.parse(reponse);
-        var sum = reponse.length;
+        var sum = data_list.length;
 
         var result = '';
         
@@ -55,9 +55,8 @@
         
 
 
-        
         /*使用for循环*/
-        for(var i=0; i< size; i++){
+        for(var i=0; i< sum; i++){
           str = '<a href={%url "sina:following_blogs" 0 %} target="_blank">'
           str = str.replace('0',data_list[i].id);
           result +='<ul class="arrow_box">'+ '<div class="sy">' +'<img src="' + data_list[i].avatar + '" class="image-circle"> '+'<p name = "detail"><a href = "' + data_list[i].post_detail + '" target="_blank">' + data_list[i].post + '</a></p>'+ '</div>' +

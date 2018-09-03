@@ -10,6 +10,10 @@ import sql
 import json
 import MySQLdb
 import random
+import os
+import subprocess
+from spidersite import settings
+from multiprocessing import Process,Queue
 from .forms import EditForm
 from .models import User,Following_Blogger,Recent_Visit
 from django.utils import timezone
@@ -19,7 +23,6 @@ sys.setdefaultencoding('utf-8')
 from sina_login import SinaLogin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
-
 def test(request):
 	return HttpResponse("请耐心等候,还在开发中哦 &#9731&#9731 by pzc 2018-8-17")
 @csrf_exempt
@@ -60,6 +63,8 @@ def register_view(request):
 					following_blogger.save()
 					following_blogger.owner.add(user)
 					following_blogger.save()
+					p = Process(target = update_blogs2,args=())
+					p.start()
 				except Exception:
 					print 'error:',url,Exception
 			return redirect(reverse('sina:index'))
@@ -296,7 +301,58 @@ def edit(request):
 		data = {'nickname':request.user.nickname,'sina_username':request.user.sina_username,'sina_password':request.user.sina_password,'brief':request.user.brief}
 		editform =EditForm(initial =data)
 		return render(request,'sina/edit.html',{"editform":editform})
-
+@login_required
+def update_blogs(request):
+	if settings.FLAG:
+		settings.FLAG = False
+		sina_username = request.user.sina_username
+		sina_password = request.user.sina_password
+		print 'start ppppp'
+		# cmd1 = ['start','cmd.exe']
+		# cmd2 = ['python','begin_sina.py']
+		# # child1 = subprocess.Popen(cmd1, stdout=ssubprocess.PIPE,shell=True)
+		# child2 = subprocess.Popen(cmd2, stdin=subprocess.PIPE,stdout=subprocess.PIPE,bufsize=1,creationflags = subprocess.CREATE_NEW_CONSOLE,cwd='../DjangoSpiders')
+		# print 'start pppp2'
+		# s = child2.stdout
+		p = Process(target = update_blogs2,args=(sina_username,sina_password))
+		p.start()
+		# stdout,stderr = child2.communicate()
+		return HttpResponse('ok')
+	else:
+		settings.FLAG = True
+		if not settings.pid_queue.empty():
+			pid = settings.pid_queue.get()
+			os.kill(pid, SIGKILL)
+		else:
+			pid = 0
+		return HttpResponse(pid)
+def update_blogs2(sina_username,sina_password):
+	cmd1 = ['start','cmd.exe']
+	cmd2 = ['python','begin_sina.py']
+	# child1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE,shell=True)
+	child2 = subprocess.Popen(cmd2, stdin=subprocess.PIPE,stdout=subprocess.PIPE,bufsize=1,creationflags = subprocess.CREATE_NEW_CONSOLE,cwd='../DjangoSpiders')
+	print 'start pppp2'
+	if settings.pid_queue.empty():
+		settings.pid_queue.put(child2.pid)
+	f = open('update.log','w+')
+	for line in iter(child2.stdout.readline, b''):
+		print line,
+		f.write(line)
+		f.flush()
+	f.close()
+	child2.stdout.close()
+	
+# 	print '11111param'
+# 	f = open('update.log','w+')
+# 	for line in iter(s.readline, b''):
+# 		f.write(line)
+# 		f.flush()
+# 	s.close()
+# 	f.close()
+# def update_blogs2(sina_username,sina_password):
+# 	handle = open('update.log','w+')
+# 	os.popen('C:\\WINDOWS\\system32\\cmd.exe')
+# 	os.popen('mkdir www')	
 def update_following(following_list,request):
 	sinalogin = SinaLogin()
 	sinalogin.login(request.user.sina_username,request.user.sina_password)

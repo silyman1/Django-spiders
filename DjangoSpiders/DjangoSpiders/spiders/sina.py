@@ -61,6 +61,8 @@ class SinaSpider(Spider):
 				# try:
 				brief_tmp = ''
 				item['itemid'] = info.get('itemid')
+				if not info.get('mblog'):
+					continue
 				item['author'] = info.get('mblog').get('user').get('screen_name')
 				print item['author']
 				item['post_detail'] = info.get('scheme')

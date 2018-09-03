@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^query_all/', views.query_all_blogs, name='query_all'),
     url(r'^about_me/', views.about_me, name='about_me'),
     url(r'^edit/', views.edit, name='edit'),
+    url(r'^update_blogs/', views.update_blogs, name='update_blogs'),
 ]

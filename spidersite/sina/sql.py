@@ -70,13 +70,21 @@ class Sql(object):
 		results = cursor.fetchall()
 		return results
 	@classmethod	
-	def query_data_by_all(cls,cursor,offset,size): 
-		sql = "SELECT * FROM sina_tb WHERE `id` BETWEEN %d AND %d " % (int(offset),int(offset)+int(size)+1)
+	def query_data_by_all(cls,cursor,offset,size,following_list): 
+		sql = "SELECT * FROM sina_tb WHERE author in (%s) LIMIT %d,%d " %( ','.join(['%s'] * len(following_list)),int(offset),int(offset)+int(size)+1)
+		# sql = "SELECT * FROM sina_tb WHERE `id` BETWEEN %d AND %d " % (int(offset),int(offset)+int(size)+1)
 
 		print sql
 		print '#######'
-		cursor.execute(sql)
+		cursor.execute(sql,following_list)
 		results = cursor.fetchall()
+		return results
+	@classmethod
+	def query_get_sum(cls,cursor,following_list):
+		sql = "SELECT COUNT(*) FROM sina_tb WHERE author in (%s) " % ','.join(['%s'] * len(following_list))
+		cursor.execute(sql,following_list)
+		results = cursor.fetchall()
+		print results
 		return results
 	@classmethod
 	def close_db(cls,db):

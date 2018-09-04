@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     url(r'^test/', views.test, name='test'),
+    url(r'^$', views.index, name='index'),
     url(r'^index/', views.index, name='index'),
     url(r'^following_list/', views.get_following_list, name='following_list'),
     url(r'^sina_bloger/(?P<f_id>[0-9]+)/blogs', views.get_following_blogs, name='following_blogs'),    
@@ -15,4 +16,7 @@ urlpatterns = [
     url(r'^about_me/', views.about_me, name='about_me'),
     url(r'^edit/', views.edit, name='edit'),
     url(r'^update_blogs/', views.update_blogs, name='update_blogs'),
+    url(r'^reupdate/', views.reupdate, name='reupdate'),
+    url(r'^stopupdate/', views.stopupdate, name='stopupdate'),
+    url(r'^ajax_query_sum/', views.ajax_query_sum, name='ajax_query_sum'),
 ]

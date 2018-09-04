@@ -11,9 +11,12 @@ import json
 import MySQLdb
 import random
 import os
+import time
 import subprocess
+import winproc
 from spidersite import settings
 from multiprocessing import Process,Queue
+import signal
 from .forms import EditForm
 from .models import User,Following_Blogger,Recent_Visit
 from django.utils import timezone
@@ -37,6 +40,9 @@ def register_view(request):
 		user=User.objects.create_user(username=username,password=password,nickname=nickname,sina_username=sina_username,sina_password=sina_password)
 		print "register:",user
 		if user:
+			fo = open('register.log','w+')
+			__stdout__ = sys.stdout
+			sys.stdout = fo
 			user = authenticate(username=username,password=password)
 			login(request,user)
 			sinalogin = SinaLogin()
@@ -63,10 +69,12 @@ def register_view(request):
 					following_blogger.save()
 					following_blogger.owner.add(user)
 					following_blogger.save()
-					p = Process(target = update_blogs2,args=())
-					p.start()
 				except Exception:
 					print 'error:',url,Exception
+			p = Process(target = update_blogs2,args=(sina_username,sina_password,settings.pid_queue))
+			p.start()
+			sys.stdout = __stdout__ 
+			fo.close()
 			return redirect(reverse('sina:index'))
 		else:
 			return render_to_response('sina/register.html')
@@ -176,7 +184,11 @@ def get_following_list(request):
 		following_list = p.page(p.num_pages)
 	recent = request.session.get("recent",None)
 	print 'recent:',recent
-	return render(request,'sina/followinglist.html',{'recent':recent.get_list(),'following_list':following_list})
+	if recent:
+		recent_l = recent.get_list()
+	else:
+		recent_l = []
+	return render(request,'sina/followinglist.html',{'recent':recent_l,'following_list':following_list})
 @login_required
 def query_all_blogs(request):
 
@@ -197,10 +209,15 @@ def get_following_blogs(request,f_id):
 def all_ajax_blog(request):
 	offset = request.GET.get('offset')
 	size = request.GET.get('size')
+	f_list = []
 	following_list = request.user.owner.all()
+	for following in following_list:
+		print following.following_name
+		print following.avatar
+		f_list.append(following.following_name.encode('utf-8'))
 	blog_list = []
 	db,cursor = sql.Sql.connect_db()
-	blog_list_l = sql.Sql.query_data_by_all(cursor,offset,size)
+	blog_list_l = sql.Sql.query_data_by_all(cursor,offset,size,f_list)
 	for c in blog_list_l:
 		item = {}
 		item['author'] = c[1]
@@ -303,37 +320,40 @@ def edit(request):
 		return render(request,'sina/edit.html',{"editform":editform})
 @login_required
 def update_blogs(request):
-	if settings.FLAG:
-		settings.FLAG = False
-		sina_username = request.user.sina_username
-		sina_password = request.user.sina_password
-		print 'start ppppp'
+	if not settings.pid_queue.empty():
+
 		# cmd1 = ['start','cmd.exe']
 		# cmd2 = ['python','begin_sina.py']
 		# # child1 = subprocess.Popen(cmd1, stdout=ssubprocess.PIPE,shell=True)
 		# child2 = subprocess.Popen(cmd2, stdin=subprocess.PIPE,stdout=subprocess.PIPE,bufsize=1,creationflags = subprocess.CREATE_NEW_CONSOLE,cwd='../DjangoSpiders')
 		# print 'start pppp2'
 		# s = child2.stdout
-		p = Process(target = update_blogs2,args=(sina_username,sina_password))
-		p.start()
+
+		# pid = 0
+		pid = settings.pid_queue.get()
+		settings.pid_queue.put(pid)
+		# if not settings.pid_queue.empty():
+		# 	pid = settings.pid_queue.get()
+		# 	settings.pid_queue.put(pid)
 		# stdout,stderr = child2.communicate()
-		return HttpResponse('ok')
+		print pid
+		# print pid
+		# time.sleep(1)
+		return render(request,'sina/loading.html',{"pid":pid})
 	else:
-		settings.FLAG = True
-		if not settings.pid_queue.empty():
-			pid = settings.pid_queue.get()
-			os.kill(pid, SIGKILL)
-		else:
-			pid = 0
-		return HttpResponse(pid)
-def update_blogs2(sina_username,sina_password):
+		# pid = settings.pid_queue.get()
+		# settings.pid_queue.put(pid)
+		# os.killpg(os.getpgid(pid), signal.SIGKILL)
+		return render(request,'sina/loading.html')
+def update_blogs2(sina_username,sina_password,pid_queue):
 	cmd1 = ['start','cmd.exe']
 	cmd2 = ['python','begin_sina.py']
 	# child1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE,shell=True)
 	child2 = subprocess.Popen(cmd2, stdin=subprocess.PIPE,stdout=subprocess.PIPE,bufsize=1,creationflags = subprocess.CREATE_NEW_CONSOLE,cwd='../DjangoSpiders')
 	print 'start pppp2'
-	if settings.pid_queue.empty():
-		settings.pid_queue.put(child2.pid)
+	print child2.pid
+	if pid_queue.empty():
+		pid_queue.put(child2.pid)
 	f = open('update.log','w+')
 	for line in iter(child2.stdout.readline, b''):
 		print line,
@@ -341,7 +361,19 @@ def update_blogs2(sina_username,sina_password):
 		f.flush()
 	f.close()
 	child2.stdout.close()
-	
+@login_required
+def reupdate(request):
+	sina_username = request.user.sina_username
+	sina_password = request.user.sina_password
+	print 'start ppppp'
+	p = Process(target = update_blogs2,args=(sina_username,sina_password,settings.pid_queue))
+	p.start()
+	return redirect(reverse('sina:query_all'))
+@login_required
+def stopupdate(request):
+	Pid = settings.pid_queue.get()
+	winproc.killPid(Pid)
+	return redirect(reverse('sina:update_blogs'))
 # 	print '11111param'
 # 	f = open('update.log','w+')
 # 	for line in iter(s.readline, b''):
@@ -370,6 +402,18 @@ def update_following(following_list,request):
 	for item in following_list:
 		if item.following_name not in following_list2:
 			item.delete()
+@login_required
+def ajax_query_sum(request):
+	f_list = []
+	following_list = request.user.owner.all()
+	for following in following_list:
+		print following.following_name
+		print following.avatar
+		f_list.append(following.following_name.encode('utf-8'))
+	db,cursor = sql.Sql.connect_db()
+	sum = sql.Sql.query_get_sum(cursor,f_list)
+	j_ret = json.dumps(sum)
+	return HttpResponse(j_ret)
 class CustemPaginator(Paginator):
 	def __init__(self, current_page, max_pager_num, *args, **kwargs):
 		# 当前页

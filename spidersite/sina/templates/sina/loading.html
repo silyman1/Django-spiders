@@ -1,0 +1,69 @@
+{%extends "sina/base.html"%}
+{% load staticfiles %}
+{%block content%}
+<article class="blogs">
+
+
+    <br>
+{%if pid%}
+    <p class="box_c"><span class="d_time">当前进程号：{{pid}}</span>
+    <br>
+    <p class="box_c"><span class="d_time">正在更新中......</span><span>已爬取总数：[<b id ="aj" style = "color:#66CCFF;">0</b>]</span></p>
+        <br>
+        <br>
+    <p style="text-align: center; margin-right: 90px;"><a href="{%url 'sina:stopupdate'%}"><span id ="a-upload">停止更新</span></a></p>
+{%else%}
+    <p class="box_c"><span class="d_time">已停止更新~~~~~~~</span><span>已爬取总数：[<b id ="aj" style = "color:#66CCFF;">0</b>]</span></p>
+        <br>
+        <br>
+    <p style="text-align: center; margin-right: 90px;"><a href="{%url 'sina:reupdate' %}"><span id ="a-upload">重新更新</span></a></p>
+{%endif%}
+    <br>
+  </div>  
+  <aside class="right">
+ 
+
+    <div class="visitors">
+      <h3>
+        <p>最近访客</p>
+      </h3>
+      <ul>
+      </ul>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="news">
+      <h3 class="ph">
+      <p>扫<span>微信:</span></p>
+    </h3>
+    <br>
+    <a href="/" class="weixin" style="background: url(../../static/images/{{request.user.barcode}})"> </a>
+  </div>
+  </aside>
+</article>
+<footer>
+  <p>Design by DanceSmile <a href="http://www.miitbeian.gov.cn/" target="_blank">蜀ICP备11002373号-1</a> <a href="/">网站统计</a></p>
+</footer>
+<script>
+    $(document).ready(function(){
+    setInterval(notice,6000);
+      function notice(){
+      $.ajax({
+      type: 'GET',
+      url: "{% url 'sina:ajax_query_sum' %}", 
+      data:{},
+      success: function(reponse){
+        var sum = JSON.parse(reponse);
+        var x = document.getElementById("aj");
+        x.innerHTML = sum;
+      },
+        error: function(xhr, type){
+        alert('Ajax error!');
+      }
+    });
+    }
+  });
+</script>
+{%endblock%}

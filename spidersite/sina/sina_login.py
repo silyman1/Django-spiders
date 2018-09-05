@@ -95,6 +95,7 @@ class SinaLogin(object):
 			print 'login failed'
 			response.raise_for_status()
 		jsondata = json.loads(response.text)
+		print jsondata
 		uid = jsondata.get('uid')
 		url2 = jsondata.get('crossDomainUrlList')[0]
 		self.uid = uid 

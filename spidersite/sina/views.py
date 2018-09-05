@@ -14,6 +14,7 @@ import os
 import time
 import subprocess
 import winproc
+import shlex
 from spidersite import settings
 from multiprocessing import Process,Queue
 import signal
@@ -45,8 +46,11 @@ def register_view(request):
 			sys.stdout = fo
 			user = authenticate(username=username,password=password)
 			login(request,user)
-			sinalogin = SinaLogin()
-			sinalogin.login(sina_username,sina_password)
+			try:
+				sinalogin = SinaLogin()
+				sinalogin.login(sina_username,sina_password)
+			except:
+				return HttpResponse('something wrong happened during login sina.com ! !!')
 			page_id_list = sinalogin.get_myfollowers_page_id()
 			for page_id in page_id_list:
 				try:
@@ -346,8 +350,11 @@ def update_blogs(request):
 		# os.killpg(os.getpgid(pid), signal.SIGKILL)
 		return render(request,'sina/loading.html')
 def update_blogs2(sina_username,sina_password,pid_queue):
+	arg = 'category=%s'%str(sina_username)
+	arg2 = 'rt=%s'%str(sina_password)
+
 	cmd1 = ['start','cmd.exe']
-	cmd2 = ['python','begin_sina.py']
+	cmd2 = ['scrapy','crawl','sina_following','-a',arg,'-a',arg2]
 	# child1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE,shell=True)
 	child2 = subprocess.Popen(cmd2, stdin=subprocess.PIPE,stdout=subprocess.PIPE,bufsize=1,creationflags = subprocess.CREATE_NEW_CONSOLE,cwd='../DjangoSpiders')
 	print 'start pppp2'

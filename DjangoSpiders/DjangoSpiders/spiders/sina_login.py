@@ -50,9 +50,11 @@ class SinaLogin(object):
 		codeStr = str(servertime) + '\t' + str(nonce) + '\n' + str(self.password) #根据js拼接方式构造明文
 		pwd = rsa.encrypt(codeStr,rsakey)  #使用rsa进行加密
 		return binascii.hexlify(pwd)  #将加密信息转换为16进制。
-	def login(self):
-		self.username = '1161626597@qq.com'#raw_input("username:")
-		self.password = 'pzc1161626597'#raw_input("password:")
+	def login(self,name,psd):
+		self.username = str(name)#raw_input("username:")
+		self.password = str(psd)#raw_input("password:")
+		print self.username
+		print self.password
 		servertime,nonce,pubkey,rsakv = self.getpostdata()
 		prelt = random.randint(40, 100)
 		su = self.encode_su()
@@ -93,6 +95,7 @@ class SinaLogin(object):
 			print 'login failed'
 			response.raise_for_status()
 		jsondata = json.loads(response.text)
+		print jsondata
 		uid = jsondata.get('uid')
 		url2 = jsondata.get('crossDomainUrlList')[0]
 		self.uid = uid 

@@ -9,12 +9,15 @@ from DjangoSpiders.items import SinaItem
 from DjangoSpiders.mysqlpipelines import pipelines
 import sys
 class SinaSpider(Spider):
-	def __init__(self,category=None,rt=None, *args, **kwargs):
+	def __init__(self,category=None,rt=None,co=None,uid=None, *args, **kwargs):
 		print category
 		print rt 
 		print kwargs
+		print co
+		self.cook = list(eval(co))
 		self.username = str(category)
 		self.password = str(rt)
+		self.uid = uid
 		self.cookies = {}
 		self.headers = {'User-Agent':'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36'
 						}
@@ -23,8 +26,13 @@ class SinaSpider(Spider):
 	allowded_domains =['weibo.com']
 	def get_pageid_list(self):
 		sinalogin = SinaLogin()
+		sinalogin.uid = self.uid
+		for item in self.cook:
+			print item
+			self.cookies[item[0]] = item[1]
+			print '11111####################'
+			sinalogin.session.cookies.set(item[0],item[1])
 		print 'username:####',self.username,self.password,'333333'
-		self.cookies = sinalogin.login(self.username,self.password)
 		page_id_list = sinalogin.get_myfollowers_page_id()
 		return page_id_list
 	def start_requests(self):

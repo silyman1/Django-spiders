@@ -35,6 +35,8 @@ class Migration(migrations.Migration):
                 ('avatar', models.CharField(default=b'avatar-default.jpg', max_length=200)),
                 ('sina_username', models.CharField(max_length=200)),
                 ('sina_password', models.CharField(max_length=200)),
+                ('brief', models.CharField(default=b'\xe6\x9a\x82\xe6\x97\xa0', max_length=200)),
+                ('barcode', models.CharField(default=b'weixin.jpg', max_length=200)),
                 ('groups', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', verbose_name='groups')),
                 ('user_permissions', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Permission', blank=True, help_text='Specific permissions for this user.', verbose_name='user permissions')),
             ],

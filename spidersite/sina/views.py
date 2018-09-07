@@ -25,6 +25,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from sina_login import SinaLogin
+sinalogin = SinaLogin()
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 def test(request):
@@ -38,19 +39,20 @@ def register_view(request):
 		nickname = request.POST['nickname']
 		sina_username = request.POST['sina_user']
 		sina_password = request.POST['sina_psw']
+		verifycode = request.POST['verifycode']
 		user=User.objects.create_user(username=username,password=password,nickname=nickname,sina_username=sina_username,sina_password=sina_password)
 		print "register:",user
 		if user:
-			fo = open('register.log','w+')
-			__stdout__ = sys.stdout
-			sys.stdout = fo
+			# fo = open('register.log','w+')
+			# __stdout__ = sys.stdout
+			# sys.stdout = fo
 			user = authenticate(username=username,password=password)
 			login(request,user)
 			try:
-				sinalogin = SinaLogin()
+				sinalogin.code = verifycode
 				sinalogin.login(sina_username,sina_password)
 			except:
-				return HttpResponse('something wrong happened during login sina.com ! !!')
+				return HttpResponse('something wrong happened during login sina.com ! !!maybe the verifycode is wrong')
 			page_id_list = sinalogin.get_myfollowers_page_id()
 			for page_id in page_id_list:
 				try:
@@ -75,15 +77,18 @@ def register_view(request):
 					following_blogger.save()
 				except Exception:
 					print 'error:',url,Exception
-			p = Process(target = update_blogs2,args=(sina_username,sina_password,settings.pid_queue))
+			cookies = sinalogin.session.cookies.items()
+			p = Process(target = update_blogs2,args=(sina_username,sina_password,settings.pid_queue,cookies,sinalogin.uid))
 			p.start()
-			sys.stdout = __stdout__ 
-			fo.close()
+			# sys.stdout = __stdout__ 
+			# fo.close()
 			return redirect(reverse('sina:index'))
 		else:
 			return render_to_response('sina/register.html')
 
 	else:
+		sinalogin2 = SinaLogin()
+		sinalogin.session = sinalogin2.session
 		return render_to_response('sina/register.html')
 @csrf_exempt
 def login_view(request):
@@ -96,9 +101,13 @@ def login_view(request):
 			username =loginform.cleaned_data['username']
 			password =loginform.cleaned_data['password']
 		'''
+		
 		username =request.POST['uname']
 		password =request.POST['psw']
-		user = authenticate(username=username,password=password)
+		try:
+			user = authenticate(username=username,password=password)
+		except:
+			return HttpResponse('用户密码不对')
 		print 'user:',user
 		if user:
 			login(request,user)
@@ -110,9 +119,19 @@ def login_view(request):
 				recent = Recent_Visit()
 			request.session["recent"] = recent
 			print request.session["recent"] ,'@@@'
+			following_list = request.user.owner.all()
+			sinalogin.code = request.POST['verifycode']
+			try:
+				update_following(following_list,request)
+			except:
+				return HttpResponse('登录超时请重试')
 			return redirect(reverse('sina:index'))
+		else:
+			return HttpResponse("用户不存在")
 		return render_to_response('sina/login.html')
 	else:
+		sinalogin2 = SinaLogin()
+		sinalogin.session = sinalogin2.session
 		return render_to_response('sina/login.html')
 @login_required
 def logout_view(request):
@@ -125,8 +144,6 @@ def index(request):
 	hot_list = []
 	comments_count_list = []
 	attitudes_count_list = []
-	following_list = request.user.owner.all()
-	update_following(following_list,request)
 	following_list = request.user.owner.all()
 	fo = open('view.log','w+')
 	__stdout__ = sys.stdout
@@ -288,7 +305,7 @@ def edit(request):
 					for TYPE in ['gif','jpeg','jpg','png','JPG']:
 
 						if name.endswith(TYPE):
-							img.save("E:\\gitprojects\\%s"%name)
+							img.save("E:\\gitprojects\\django-spiders\\spidersite\\sina\\static\\images\\%s"%name)
 							break
 						else:
 							print  'wrong type img'
@@ -349,12 +366,13 @@ def update_blogs(request):
 		# settings.pid_queue.put(pid)
 		# os.killpg(os.getpgid(pid), signal.SIGKILL)
 		return render(request,'sina/loading.html')
-def update_blogs2(sina_username,sina_password,pid_queue):
+def update_blogs2(sina_username,sina_password,pid_queue,cookies,uid):
 	arg = 'category=%s'%str(sina_username)
 	arg2 = 'rt=%s'%str(sina_password)
-
+	arg3 = 'co=%s'%cookies
+	uid = 'uid=%s'%str(uid)
 	cmd1 = ['start','cmd.exe']
-	cmd2 = ['scrapy','crawl','sina_following','-a',arg,'-a',arg2]
+	cmd2 = ['scrapy','crawl','sina_following','-a',arg,'-a',arg2,'-a',arg3,'-a',uid]
 	# child1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE,shell=True)
 	child2 = subprocess.Popen(cmd2, stdin=subprocess.PIPE,stdout=subprocess.PIPE,bufsize=1,creationflags = subprocess.CREATE_NEW_CONSOLE,cwd='../DjangoSpiders')
 	print 'start pppp2'
@@ -373,7 +391,8 @@ def reupdate(request):
 	sina_username = request.user.sina_username
 	sina_password = request.user.sina_password
 	print 'start ppppp'
-	p = Process(target = update_blogs2,args=(sina_username,sina_password,settings.pid_queue))
+	cookies = sinalogin.session.cookies.items()
+	p = Process(target = update_blogs2,args=(sina_username,sina_password,settings.pid_queue,cookies,sinalogin.uid))
 	p.start()
 	return redirect(reverse('sina:query_all'))
 @login_required
@@ -393,7 +412,6 @@ def stopupdate(request):
 # 	os.popen('C:\\WINDOWS\\system32\\cmd.exe')
 # 	os.popen('mkdir www')	
 def update_following(following_list,request):
-	sinalogin = SinaLogin()
 	sinalogin.login(request.user.sina_username,request.user.sina_password)
 	following_list2_l = sinalogin.get_myfollow()
 	following_list2 = [f[0] for f in following_list2_l]
@@ -414,8 +432,6 @@ def ajax_query_sum(request):
 	f_list = []
 	following_list = request.user.owner.all()
 	for following in following_list:
-		print following.following_name
-		print following.avatar
 		f_list.append(following.following_name.encode('utf-8'))
 	db,cursor = sql.Sql.connect_db()
 	sum = sql.Sql.query_get_sum(cursor,f_list)

@@ -9,8 +9,11 @@ import random
 import rsa
 import urllib
 import json
+import pytesseract
+from PIL import Image
 # from bs4 import BeautifulSoup
 import sys
+from io import BytesIO
 reload(sys)
 sys.setdefaultencoding('utf-8')
 class SinaLogin(object):
@@ -27,6 +30,46 @@ class SinaLogin(object):
 		self.following_list = []
 		if(self.s.status_code == 200):
 			print 'init session successfully'
+		self.get_vercode()
+		self.code = ''
+	def get_vercode(self):
+		response = self.session.get('https://login.sina.com.cn/cgi/pin.php?r=3309065&s=0',headers=self.headers)
+		image = Image.open(BytesIO(response.content))
+		path = 'E:\\gitprojects\\django-spiders\\spidersite\\sina\\static\\images'
+		image.save(path+'\pin.png')
+		print 'get verifycode ok !!'
+		pic_open = Image.open(path+'\pin.png','r')
+		# code = self.convert(path,pic_open)
+		# return code
+	# def convert(self,pic_path,pic):
+	# 	#先将图片进行灰度处理，也就是处理成单色，然后进行下一步单色对比
+	# 	imgrey = pic.convert('L')
+	# 	#去除图片噪点,170是经过多次调整后,去除噪点的最佳值
+	# 	'''
+	# 	其实就是对已处理的灰度图片,中被认为可能形成验证码字符的像素进行阀值设定,
+	# 	如果阀值等于170,我就认为是形成验证码字符串的所需像素,然后将其添加进一个空table中,
+	# 	最后通过im.point将使用table拼成一个新验证码图片
+	# 	'''
+	# 	threshold = 170
+	# 	table = []
+	# 	for i in range(256):
+	# 		if i < threshold:
+	# 			table.append(0)
+	# 		else:
+	# 			table.append(1)
+	# 	#使用table（是上面生成好的）生成图片
+	# 	out = imgrey.point(table,'1')
+	# 	out.save(pic_path + '/' + 'cjb'+ str(threshold) + '.jpeg','jpeg')
+	# 	#读取处理好的图片的路径
+	# 	a = pic_path + '/' + 'cjb' + str(threshold) + '.jpeg'
+
+	# 	img3 = Image.open(a,'r')
+	# 	#将图片中的像素点识别成字符串（图片中的像素点如果没有处理好，
+	# 	#可能在识别过程中会有误差，如多个字符少个字符，或者识别错误等）
+	# 	vcode = pytesseract.image_to_string(img3)
+
+	# 	print(vcode)#此句也是测试结果时使用的
+	# 	return vcode#此句才是将被破解的验证码字符串返回给需要的代码的
 	def getpostdata(self):
 		pre_url = 'https://login.sina.com.cn/sso/prelogin.php?entry=account&callback=sinaSSOController.preloginCallBack&su=MTE2MTYyNjU5NyU0MHFxLmNvbQ%3D%3D&rsakt=mod&client=ssologin.js(v1.4.15)&_=1534126164960%20HTTP/1.1'
 		response = self.session.get(pre_url)
@@ -76,6 +119,7 @@ class SinaLogin(object):
 					'useticket':0,
 					'pagerefer':'',
 					'vsnf':1,
+					'door':self.code,
 					'su':su,
 					'service':'account',
 					'servertime':servertime,
@@ -96,6 +140,7 @@ class SinaLogin(object):
 			response.raise_for_status()
 		jsondata = json.loads(response.text)
 		print jsondata
+		print 'code:',self.code
 		uid = jsondata.get('uid')
 		url2 = jsondata.get('crossDomainUrlList')[0]
 		self.uid = uid 

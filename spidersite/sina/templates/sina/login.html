@@ -20,6 +20,11 @@
        	  	  <form action="/accounts/login/" method="post" onsubmit = 'return check()'>
                 <input name="uname" type="text" class="kuang_txt"  placeholder="手机号">
                 <input name="psw" type="password" class="kuang_txt"  placeholder="密码">
+                <input name="verifycode" type="text" class="kuang_txt yanzm" placeholder="验证码">
+                <div>
+                    <div class="hui_kuang"><img src="{%static 'images/pin.png'%}" width="92" height="31"></div>
+                    <div class="shuaxin"><a href="#"><img src="{%static 'login_static/images/zc_25.jpg'%}" width="13" height="14"></a></div>
+                </div>
                 <div>
                		<a href="#">忘记密码？</a><input name="" type="checkbox" value="" checked><span>记住我</span> 
                 </div>
